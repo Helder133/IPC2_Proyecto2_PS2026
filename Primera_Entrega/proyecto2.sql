@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS propuesta (
 CREATE TABLE IF NOT EXISTS contrato (
 	contrato_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	propuesta_id INT NOT NULL,
-	comentario VARCHAR(200) NOT NULL,
+	comentario VARCHAR(200),
 	calificacion INT CHECK (calificacion >= 1 AND calificacion <= 5),
 	CONSTRAINT fk_propuesta FOREIGN KEY (propuesta_id) REFERENCES propuesta (propuesta_id)
 );
@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS entrega (
 	contrato_id INT NOT NULL,
 	descripcion VARCHAR(200) NOT NULL,
 	archivo VARCHAR(200) NOT NULL,
+	estado ENUM('PENDIENTE','APROBADA','RECHAZADA') NOT NULL DEFAULT 'PENDIENTE',
 	motivo_rechazo VARCHAR(200),
 	fecha DATE NOT NULL,
 	CONSTRAINT fk_contrato FOREIGN KEY (contrato_id) REFERENCES contrato (contrato_id)
@@ -124,7 +125,7 @@ CREATE TABLE IF NOT EXISTS entrega (
 
 CREATE TABLE IF NOT EXISTS cartera_plataforma (
 	plataforma_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-	saldo DECIMAL(10,2) NOT NULL,
+	saldo DECIMAL(10,2) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS transaccion_plataforma (
@@ -146,7 +147,7 @@ CREATE TABLE IF NOT EXISTS nueva_h_c (
 	tipo ENUM ('HABILIDAD','CATEGORIA') NOT NULL,
 	estado ENUM('PENDIENTE','ACEPTADA','RECHAZADA') NOT NULL DEFAULT 'PENDIENTE',
 	fecha_creacion DATE NOT NULL,
-	CONSTRAINT fk_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id)
+	CONSTRAINT fk_usuario3 FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id)
 );
 
 CREATE TABLE IF NOT EXISTS configuracion_sistema (
