@@ -12,8 +12,23 @@ CREATE TABLE IF NOT EXISTS usuario (
 	direccion VARCHAR(200) NOT NULL,
 	cui VARCHAR(20) NOT NULL,
 	fecha_nacimiento DATE NOT NULL,
-	rol ENUM ('Cliente','Freelancer','Administrador') NOT NULL 
+	rol ENUM ('Cliente','Freelancer','Administrador') NOT NULL,
+	estado BOOL NOT NULL DEFAULT 1
 );
+
+-- password 123
+INSERT INTO usuario (nombre_completo,user_name,password,email,telefono,direccion,cui,fecha_nacimiento,rol) VALUES (
+'Admin',
+'admin',
+'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3',
+'admin@gmail.com',
+'00000000',
+'CUNOC',
+'1234567890123',
+'2004-08-07',
+'Administrador');
+
+SELECT * FROM usuario WHERE (user_name = 'Admin' OR email = 'Admin') AND password = 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3' AND estado = 1;
 
 CREATE TABLE IF NOT EXISTS cliente (
 	usuario_id INT PRIMARY KEY NOT NULL,
