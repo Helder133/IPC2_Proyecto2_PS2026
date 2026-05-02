@@ -3,6 +3,8 @@ package org.proyecto2.proyecto2.dtos.usuario;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import org.proyecto2.proyecto2.dtos.usuario.cliente.ClienteUpdate;
+import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerUpdate;
 
 import java.time.LocalDate;
 
@@ -18,6 +20,8 @@ public class UsuarioUpdate {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate fechaNacimiento;
+    private ClienteUpdate clienteUpdate;
+    private FreelancerUpdate freelancerUpdate;
 
     public int getUsuarioId() {
         return usuarioId;
@@ -89,5 +93,21 @@ public class UsuarioUpdate {
 
     public void setFechaNacimiento(LocalDate fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public ClienteUpdate getClienteUpdate() {
+        return clienteUpdate;
+    }
+
+    public void setClienteUpdate(ClienteUpdate clienteUpdate) {
+        this.clienteUpdate = clienteUpdate;
+    }
+
+    public FreelancerUpdate getFreelancerUpdate() {
+        return freelancerUpdate;
+    }
+
+    public void setFreelancerUpdate(FreelancerUpdate freelancerUpdate) {
+        this.freelancerUpdate = freelancerUpdate;
     }
 }

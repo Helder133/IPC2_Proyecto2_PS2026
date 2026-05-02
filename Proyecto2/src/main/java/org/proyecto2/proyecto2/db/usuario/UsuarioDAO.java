@@ -144,7 +144,7 @@ public class UsuarioDAO implements CRUD<Usuario> {
 
     public int insertClienteFreelancer(Usuario usuario) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(INSERT_USUARIO,  Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_USUARIO, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, usuario.getNombreCompleto());
             statement.setString(2, usuario.getUserName());
             statement.setString(3, usuario.getPassword());
@@ -168,6 +168,21 @@ public class UsuarioDAO implements CRUD<Usuario> {
     @Override
     public void update(Usuario usuario) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(UPDATE_USUARIO)) {
+            statement.setString(1, usuario.getNombreCompleto());
+            statement.setString(2, usuario.getUserName());
+            statement.setString(3, usuario.getPassword());
+            statement.setString(4, usuario.getEmail());
+            statement.setString(5, usuario.getTelefono());
+            statement.setString(6, usuario.getDireccion());
+            statement.setString(7, usuario.getCui());
+            statement.setDate(8, Date.valueOf(usuario.getFechaNacimiento()));
+            statement.setInt(9, usuario.getUsuarioId());
+            statement.executeUpdate();
+        }
+    }
+
+    public void update(Connection connection, Usuario usuario) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(UPDATE_USUARIO)) {
             statement.setString(1, usuario.getNombreCompleto());
             statement.setString(2, usuario.getUserName());

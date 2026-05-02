@@ -3,6 +3,8 @@ package org.proyecto2.proyecto2.models.usuario;
 import org.apache.commons.lang3.StringUtils;
 import org.proyecto2.proyecto2.dtos.usuario.UsuarioRequest;
 import org.proyecto2.proyecto2.dtos.usuario.UsuarioUpdate;
+import org.proyecto2.proyecto2.models.usuario.cliente.Cliente;
+import org.proyecto2.proyecto2.models.usuario.freelancer.Freelancer;
 import org.proyecto2.proyecto2.utils.HashUtil;
 
 import java.time.LocalDate;
@@ -19,6 +21,8 @@ public class Usuario {
     private LocalDate fechaNacimiento;
     private EnumUsuario rol;
     private boolean estado;
+    private Cliente cliente;
+    private Freelancer freelancer;
 
     public Usuario(String nombreCompleto, String userName, String password, String email, String telefono, String direccion, String cui, EnumUsuario rol, LocalDate fechaNacimiento) {
         this.nombreCompleto = nombreCompleto;
@@ -144,6 +148,22 @@ public class Usuario {
 
     public void setEstado(boolean estado) {
         this.estado = estado;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public Freelancer getFreelancer() {
+        return freelancer;
+    }
+
+    public void setFreelancer(Freelancer freelancer) {
+        this.freelancer = freelancer;
     }
 
     public boolean isValid() {

@@ -1,10 +1,13 @@
 package org.proyecto2.proyecto2.services.usuario;
 
+import org.proyecto2.proyecto2.db.config.DBConnection;
 import org.proyecto2.proyecto2.db.usuario.UsuarioDAO;
 import org.proyecto2.proyecto2.dtos.usuario.UsuarioRequest;
 import org.proyecto2.proyecto2.dtos.usuario.UsuarioUpdate;
 import org.proyecto2.proyecto2.dtos.usuario.cliente.ClienteRequest;
+import org.proyecto2.proyecto2.dtos.usuario.cliente.ClienteUpdate;
 import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerRequest;
+import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerUpdate;
 import org.proyecto2.proyecto2.exceptions.EntityAlreadyExistsException;
 import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
@@ -12,6 +15,7 @@ import org.proyecto2.proyecto2.models.usuario.Usuario;
 import org.proyecto2.proyecto2.services.usuario.cliente.ClienteService;
 import org.proyecto2.proyecto2.services.usuario.freelancer.FreelancerService;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -71,18 +75,26 @@ public class UsuarioService {
         if (usuarioId <= 0)
             throw new UserDataInvalidException("El id del usuario es requerido y debe ser un número entero positivo.");
         UsuarioDAO usuarioDAO = new UsuarioDAO();
-        Optional<Usuario> usuario = usuarioDAO.getById(usuarioId);
-        if (usuario.isEmpty())
+        Optional<Usuario> usuarioOptional = usuarioDAO.getById(usuarioId);
+        if (usuarioOptional.isEmpty())
             throw new UserDataInvalidException("No se puedo obtener el usuario seleccionado, vuelva a intentar.");
-        return usuario.get();
+        Usuario usuario = usuarioOptional.get();
+        if (EnumUsuario.Cliente.equals(usuario.getRol())) {
+            ClienteService clienteService = new ClienteService();
+            usuario.setCliente(clienteService.getComplemento(usuarioId).orElse(null));
+        } else if (EnumUsuario.Freelancer.equals(usuario.getRol())) {
+            FreelancerService freelancerService = new FreelancerService();
+            usuario.setFreelancer(freelancerService.getComplemento(usuarioId).orElse(null));
+        }
+        return usuario;
     }
 
-    public void updateUsuario(int usuarioId, UsuarioUpdate usuarioUpdate) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
+    public void updateUsuario(int usuarioId, UsuarioUpdate usuarioUpdate, EnumUsuario rol) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
         Usuario usuario = new Usuario(usuarioUpdate);
         if (!usuario.isValidUpdate()) throw new UserDataInvalidException("Todos los campos son requeridos.");
         UsuarioDAO usuarioDAO = new UsuarioDAO();
-        if (usuario.getUsuarioId() != usuarioId)
-            throw new UserDataInvalidException("El id del usuario no coincide con el id del usuario a actualizar.");
+        usuario.setUsuarioId(usuarioId);
+        usuario.setRol(rol);
         if (usuarioDAO.validUsernameUpdate(usuario.getUserName(), usuario.getUsuarioId()))
             throw new EntityAlreadyExistsException("El username ya està registrado en otro usuario.");
         if (usuarioDAO.validEmailUpdate(usuario.getEmail(), usuario.getUsuarioId()))
@@ -91,7 +103,31 @@ public class UsuarioService {
             throw new EntityAlreadyExistsException("El cui ya està registrado en otro usuario.");
         if (usuarioDAO.validTelefonoUpdate(usuario.getTelefono(), usuario.getUsuarioId()))
             throw new EntityAlreadyExistsException("El teléfono ya està registrado en otro usuario.");
-        usuarioDAO.update(usuario);
+        if (EnumUsuario.Administrador.equals(usuario.getRol())) {
+            usuarioDAO.update(usuario);
+        } else {
+            actualizarUsuarioClienteFreelancer(usuario, usuarioUpdate.getClienteUpdate(), usuarioUpdate.getFreelancerUpdate(), usuarioDAO);
+        }
+    }
+
+    private void actualizarUsuarioClienteFreelancer(Usuario usuario, ClienteUpdate clienteUpdate, FreelancerUpdate freelancerUpdate, UsuarioDAO usuarioDAO) throws SQLException, UserDataInvalidException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        connection.setAutoCommit(false);
+        try {
+            if (EnumUsuario.Cliente.equals(usuario.getRol())) {
+                ClienteService clienteService = new ClienteService();
+                clienteService.updateComplemento(connection, clienteUpdate, usuario.getRol(), usuario.getUsuarioId());
+            } else if (EnumUsuario.Freelancer.equals(usuario.getRol())) {
+                FreelancerService freelancerService = new FreelancerService();
+                freelancerService.updateComplemento(connection, freelancerUpdate, usuario.getRol(), usuario.getUsuarioId());
+            }
+            usuarioDAO.update(connection, usuario);
+        } catch (Exception e) {
+            connection.rollback();
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
+        }
     }
 
     public void updateUsuarioEstado(int usuarioId, EnumUsuario rol) throws SQLException, UserDataInvalidException {

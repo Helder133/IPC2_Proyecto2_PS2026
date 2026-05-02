@@ -14,21 +14,6 @@ import org.proyecto2.proyecto2.services.usuario.login.LoginService;
 @Path("/auth")
 public class LoginResource {
 
-    /*@POST
-    @Secured
-    @Path("/crear-reporte")
-    public Response crearReporte(@Context ContainerRequestContext request) {
-        String rolUsuario = (String) request.getProperty("rol");
-
-        if (!"Administrador".equals(rolUsuario)) {
-            return Response.status(Response.Status.FORBIDDEN)
-                    .entity("Solo los administradores pueden hacer esto.")
-                    .build();
-        }
-
-        // Lógica para crear el reporte...
-    }*/
-
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

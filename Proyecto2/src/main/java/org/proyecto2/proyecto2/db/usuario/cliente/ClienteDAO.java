@@ -51,6 +51,16 @@ public class ClienteDAO implements CRUD<Cliente> {
         }
     }
 
+    public void update(Cliente cliente, Connection connection) throws SQLException {
+        try (PreparedStatement update = connection.prepareStatement(UPDATE_COMPLEMENTO)) {
+            update.setString(1, cliente.getDescripcion());
+            update.setString(2, cliente.getSector());
+            update.setString(3, cliente.getSitioWeb());
+            update.setInt(4, cliente.getUsuarioId());
+            update.executeUpdate();
+        }
+    }
+
     @Override
     public void delete(int id) throws SQLException {
 

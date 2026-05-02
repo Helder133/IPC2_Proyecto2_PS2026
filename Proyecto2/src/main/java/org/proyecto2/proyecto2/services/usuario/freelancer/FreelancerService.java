@@ -7,6 +7,7 @@ import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
 import org.proyecto2.proyecto2.models.usuario.freelancer.Freelancer;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
 
@@ -17,10 +18,12 @@ public class FreelancerService {
             throw new UserDataInvalidException(String.format("Solo un usuario con el rol: %s, puede agregar un complemento de freelancer.", EnumUsuario.Freelancer));
         if (!freelancer.isValid()) throw new UserDataInvalidException("Descripción, experiencia y tarifa por hora son requeridos");
         FreelancerDAO freelancerDAO = new FreelancerDAO();
+        if (freelancerDAO.validComplemento(freelancer.getUsuarioId()))
+            throw new UserDataInvalidException("El complemento de freelancer ya està registrado para este usuario.");
         freelancerDAO.insert(freelancer);
     }
 
-    public void updateComplemento(FreelancerUpdate freelancerUpdate, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException {
+    public void updateComplemento(Connection connection, FreelancerUpdate freelancerUpdate, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException {
         Freelancer  freelancer = new Freelancer(freelancerUpdate);
         if (!freelancer.isValid()) throw new UserDataInvalidException("Descripción, experiencia y tarifa por hora son requeridos");
         if (!EnumUsuario.Freelancer.equals(rol))
@@ -28,7 +31,7 @@ public class FreelancerService {
         if (freelancer.getUsuarioId() != usuarioId)
             throw new UserDataInvalidException("No cuenta con el permiso para actualizar el complemento de freelancer de otro usuario.");
         FreelancerDAO freelancerDAO = new FreelancerDAO();
-        freelancerDAO.update(freelancer);
+        freelancerDAO.update(connection, freelancer);
     }
 
     public Optional<Freelancer> getComplemento(int usuarioId) throws SQLException {

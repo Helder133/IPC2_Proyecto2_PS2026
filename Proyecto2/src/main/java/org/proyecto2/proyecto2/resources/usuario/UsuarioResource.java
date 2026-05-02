@@ -168,8 +168,9 @@ public class UsuarioResource {
     public Response updateUsuarioActualizar(@Context ContainerRequestContext request, UsuarioUpdate usuarioUpdate) {
         try {
             int usuarioId = (int) request.getProperty("usuarioId");
+            String rolUsuario = (String) request.getProperty("rol");
             UsuarioService usuarioService = new UsuarioService();
-            usuarioService.updateUsuario(usuarioId, usuarioUpdate);
+            usuarioService.updateUsuario(usuarioId, usuarioUpdate, EnumUsuario.valueOf(rolUsuario));
             return Response.ok("{\"mensaje\": \"Usuario actualizado exitosamente\"}").build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);

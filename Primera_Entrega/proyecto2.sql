@@ -30,7 +30,7 @@ INSERT INTO usuario (nombre_completo,user_name,password,email,telefono,direccion
 
 SELECT * FROM usuario WHERE (user_name = 'Admin' OR email = 'Admin') AND password = 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3' AND estado = 1;
 
-SELECT * FROM usuario;
+SELECT u.*, c.*, f.* FROM usuario u LEFT JOIN cliente c ON u.usuario_id = c.usuario_id LEFT JOIN freelancer f ON u.usuario_id = f.usuario_id;
 
 CREATE TABLE IF NOT EXISTS cliente (
 	usuario_id INT PRIMARY KEY NOT NULL,

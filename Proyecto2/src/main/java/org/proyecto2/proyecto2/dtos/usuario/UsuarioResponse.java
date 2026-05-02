@@ -1,11 +1,15 @@
 package org.proyecto2.proyecto2.dtos.usuario;
 
+import org.proyecto2.proyecto2.dtos.usuario.cliente.ClienteResponse;
+import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerResponse;
 import org.proyecto2.proyecto2.models.usuario.Usuario;
 
 public class UsuarioResponse extends UsuarioRequest {
     private int usuarioId;
     private boolean estado;
-    // Se ira agregando mas datos a enviar con forme se valla avanzando en el proyecto
+    private ClienteResponse cliente;
+    private FreelancerResponse freelancer;
+
     public UsuarioResponse(Usuario usuario) {
         this.usuarioId = usuario.getUsuarioId();
         this.nombreCompleto = usuario.getNombreCompleto();
@@ -18,6 +22,8 @@ public class UsuarioResponse extends UsuarioRequest {
         this.fechaNacimiento = usuario.getFechaNacimiento();
         this.rol = usuario.getRol();
         this.estado = usuario.isEstado();
+        this.cliente = usuario.getCliente() == null ? null : new ClienteResponse(usuario.getCliente());
+        this.freelancer = usuario.getFreelancer() == null ? null : new FreelancerResponse(usuario.getFreelancer());
     }
 
     public int getUsuarioId() {
@@ -34,5 +40,21 @@ public class UsuarioResponse extends UsuarioRequest {
 
     public void setEstado(boolean estado) {
         this.estado = estado;
+    }
+
+    public ClienteResponse getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(ClienteResponse cliente) {
+        this.cliente = cliente;
+    }
+
+    public FreelancerResponse getFreelancer() {
+        return freelancer;
+    }
+
+    public void setFreelancer(FreelancerResponse freelancer) {
+        this.freelancer = freelancer;
     }
 }

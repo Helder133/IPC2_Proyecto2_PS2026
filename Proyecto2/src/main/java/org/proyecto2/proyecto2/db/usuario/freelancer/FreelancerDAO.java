@@ -52,6 +52,16 @@ public class FreelancerDAO implements CRUD<Freelancer> {
         }
     }
 
+    public void update(Connection connection, Freelancer freelancer) throws SQLException {
+        try (PreparedStatement update = connection.prepareStatement(UPDATE_COMPLEMENTO)) {
+            update.setString(1, freelancer.getDescripcion());
+            update.setString(2, freelancer.getExperiencia().name());
+            update.setDouble(3, freelancer.getTarifaHora());
+            update.setInt(4, freelancer.getUsuarioId());
+            update.executeUpdate();
+        }
+    }
+
     @Override
     public void delete(int id) throws SQLException {
 
