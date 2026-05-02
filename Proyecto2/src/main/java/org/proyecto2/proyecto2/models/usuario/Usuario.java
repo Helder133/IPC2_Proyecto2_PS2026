@@ -1,5 +1,10 @@
 package org.proyecto2.proyecto2.models.usuario;
 
+import org.apache.commons.lang3.StringUtils;
+import org.proyecto2.proyecto2.dtos.usuario.UsuarioRequest;
+import org.proyecto2.proyecto2.dtos.usuario.UsuarioUpdate;
+import org.proyecto2.proyecto2.utils.HashUtil;
+
 import java.time.LocalDate;
 
 public class Usuario {
@@ -26,6 +31,31 @@ public class Usuario {
         this.rol = rol;
         this.fechaNacimiento = fechaNacimiento;
         this.estado = true;
+    }
+
+    public Usuario(UsuarioRequest usuarioRequest) {
+        this.nombreCompleto = usuarioRequest.getNombreCompleto();
+        this.userName = usuarioRequest.getUserName();
+        this.password = encriptar(usuarioRequest.getPassword());
+        this.email = usuarioRequest.getEmail();
+        this.telefono = usuarioRequest.getTelefono();
+        this.direccion = usuarioRequest.getDireccion();
+        this.cui = usuarioRequest.getCui();
+        this.rol = usuarioRequest.getRol();
+        this.fechaNacimiento = usuarioRequest.getFechaNacimiento();
+        this.estado = true;
+    }
+
+    public Usuario(UsuarioUpdate usuarioUpdate) {
+        this.nombreCompleto = usuarioUpdate.getNombreCompleto();
+        this.userName = usuarioUpdate.getUserName();
+        this.password = encriptar(usuarioUpdate.getPassword());
+        this.email = usuarioUpdate.getEmail();
+        this.telefono = usuarioUpdate.getTelefono();
+        this.direccion = usuarioUpdate.getDireccion();
+        this.cui = usuarioUpdate.getCui();
+        this.fechaNacimiento = usuarioUpdate.getFechaNacimiento();
+        this.usuarioId = usuarioUpdate.getUsuarioId();
     }
 
     public int getUsuarioId() {
@@ -114,5 +144,33 @@ public class Usuario {
 
     public void setEstado(boolean estado) {
         this.estado = estado;
+    }
+
+    public boolean isValid() {
+        return StringUtils.isNotBlank(nombreCompleto) &&
+               StringUtils.isNotBlank(userName) &&
+               StringUtils.isNotBlank(password) &&
+               StringUtils.isNotBlank(email) &&
+               StringUtils.isNotBlank(telefono) &&
+               StringUtils.isNotBlank(direccion) &&
+               StringUtils.isNotBlank(cui) &&
+               fechaNacimiento != null &&
+               rol != null;
+    }
+
+    public boolean isValidUpdate() {
+        return StringUtils.isNotBlank(nombreCompleto) &&
+                StringUtils.isNotBlank(userName) &&
+                StringUtils.isNotBlank(email) &&
+                StringUtils.isNotBlank(telefono) &&
+                StringUtils.isNotBlank(direccion) &&
+                StringUtils.isNotBlank(cui) &&
+                fechaNacimiento != null &&
+                usuarioId > 0;
+    }
+
+    private String encriptar(String password) {
+        if (StringUtils.isBlank(password)) return null;
+        return HashUtil.sha256(password);
     }
 }

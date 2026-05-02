@@ -30,6 +30,8 @@ INSERT INTO usuario (nombre_completo,user_name,password,email,telefono,direccion
 
 SELECT * FROM usuario WHERE (user_name = 'Admin' OR email = 'Admin') AND password = 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3' AND estado = 1;
 
+SELECT * FROM usuario;
+
 CREATE TABLE IF NOT EXISTS cliente (
 	usuario_id INT PRIMARY KEY NOT NULL,
 	descripcion VARCHAR(200) NOT NULL,
@@ -41,7 +43,7 @@ CREATE TABLE IF NOT EXISTS cliente (
 CREATE TABLE IF NOT EXISTS freelancer (
 	usuario_id INT PRIMARY KEY NOT NULL,
 	descripcion VARCHAR(200) NOT NULL,
-	experiencia ENUM ('Junior','Semi-Senior','Senior') NOT NULL,
+	experiencia ENUM ('Junior','Semi_Senior','Senior') NOT NULL,
 	tarifa_hora DECIMAL(10,2),
 	CONSTRAINT fk_freelancer FOREIGN KEY (usuario_id) REFERENCES usuario (usuario_id)
 );

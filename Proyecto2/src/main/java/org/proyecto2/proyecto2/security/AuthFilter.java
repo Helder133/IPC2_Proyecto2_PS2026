@@ -29,12 +29,14 @@ public class AuthFilter implements ContainerRequestFilter {
             Claims claims = JwtUtil.validarYObtenerUsername(token);
             String username = claims.getSubject();
             String rol = claims.get("rol", String.class);
+            Object idObj = claims.get("usuarioId");
+            int usuarioId = ((Number) idObj).intValue();
             requestContext.setProperty("username", username);
             requestContext.setProperty("rol", rol);
+            requestContext.setProperty("usuarioId", usuarioId);
         } catch (JwtException e) {
             rechazarPeticion(requestContext, "Token inválido o expirado. Inicie sesión nuevamente.");
         }
-
     }
 
     private void rechazarPeticion(ContainerRequestContext requestContext, String mensajeError) {
@@ -45,5 +47,4 @@ public class AuthFilter implements ContainerRequestFilter {
                         .build()
         );
     }
-
 }

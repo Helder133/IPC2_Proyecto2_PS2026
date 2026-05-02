@@ -26,6 +26,7 @@ public class UsuarioDAO implements CRUD<Usuario> {
     private static final String VALID_EMAIL_UPDATE = "SELECT usuario_id FROM usuario WHERE email = ? AND usuario_id <> ?";
     private static final String VALID_TELEFONO_UPDATE = "SELECT usuario_id FROM usuario WHERE telefono = ? AND usuario_id <> ?";
     private static final String VALID_CUI_UPDATE = "SELECT usuario_id FROM usuario WHERE cui = ? AND usuario_id <> ?";
+    private static final String GET_USUARIO_BY_COINCIDENCE = "SELECT * FROM usuario WHERE user_name LIKE ? OR email LIKE ? OR telefono LIKE ? OR cui LIKE ?";
 
     public Optional<Usuario> login(Login login) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
@@ -137,7 +138,30 @@ public class UsuarioDAO implements CRUD<Usuario> {
             statement.setString(7, usuario.getCui());
             statement.setDate(8, Date.valueOf(usuario.getFechaNacimiento()));
             statement.setString(9, usuario.getRol().name());
-            statement.execute();
+            statement.executeUpdate();
+        }
+    }
+
+    public int insertClienteFreelancer(Usuario usuario) throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_USUARIO,  Statement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, usuario.getNombreCompleto());
+            statement.setString(2, usuario.getUserName());
+            statement.setString(3, usuario.getPassword());
+            statement.setString(4, usuario.getEmail());
+            statement.setString(5, usuario.getTelefono());
+            statement.setString(6, usuario.getDireccion());
+            statement.setString(7, usuario.getCui());
+            statement.setDate(8, Date.valueOf(usuario.getFechaNacimiento()));
+            statement.setString(9, usuario.getRol().name());
+
+            int filasAfectadas = statement.executeUpdate();
+
+            if (filasAfectadas == 0) throw new SQLException("No se pudo insertar el usuario.");
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) return generatedKeys.getInt(1);
+                else throw new SQLException("No se generó el ID del usuario.");
+            }
         }
     }
 
@@ -154,7 +178,7 @@ public class UsuarioDAO implements CRUD<Usuario> {
             statement.setString(7, usuario.getCui());
             statement.setDate(8, Date.valueOf(usuario.getFechaNacimiento()));
             statement.setInt(9, usuario.getUsuarioId());
-            statement.execute();
+            statement.executeUpdate();
         }
     }
 
@@ -162,7 +186,7 @@ public class UsuarioDAO implements CRUD<Usuario> {
         Connection connection = DBConnection.getInstance().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(UPDATE_ESTADO)) {
             statement.setInt(1, usuarioId);
-            statement.execute();
+            statement.executeUpdate();
         }
     }
 
@@ -190,6 +214,22 @@ public class UsuarioDAO implements CRUD<Usuario> {
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) usuarios.add(extraerDatos(resultSet));
             return usuarios;
+        }
+    }
+
+    public List<Usuario> getByCoincidence(String search) throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        List<Usuario> usuarios = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement(GET_USUARIO_BY_COINCIDENCE)) {
+            String searchPattern = "%" + search + "%";
+            statement.setString(1, searchPattern);
+            statement.setString(2, searchPattern);
+            statement.setString(3, searchPattern);
+            statement.setString(4, searchPattern);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) usuarios.add(extraerDatos(resultSet));
+                return usuarios;
+            }
         }
     }
 

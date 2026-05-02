@@ -10,7 +10,7 @@ public class Login {
 
     public Login(LoginRequest loginRequest) {
         this.username = loginRequest.getUsername();
-        this.password = HashUtil.sha256(loginRequest.getPassword());
+        this.password = HashUtil.sha256(loginRequest.getPassword().trim());
     }
 
     public String getUsername() {

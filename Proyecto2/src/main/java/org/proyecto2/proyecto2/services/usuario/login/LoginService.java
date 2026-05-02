@@ -1,6 +1,5 @@
-package org.proyecto2.proyecto2.services.usuario;
+package org.proyecto2.proyecto2.services.usuario.login;
 
-import org.apache.commons.lang3.StringUtils;
 import org.proyecto2.proyecto2.db.usuario.UsuarioDAO;
 import org.proyecto2.proyecto2.dtos.usuario.login.LoginRequest;
 import org.proyecto2.proyecto2.dtos.usuario.login.LoginResponse;

@@ -9,7 +9,7 @@ import jakarta.ws.rs.core.Response;
 import org.proyecto2.proyecto2.dtos.usuario.login.LoginRequest;
 import org.proyecto2.proyecto2.dtos.usuario.login.LoginResponse;
 import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
-import org.proyecto2.proyecto2.services.usuario.LoginService;
+import org.proyecto2.proyecto2.services.usuario.login.LoginService;
 
 @Path("/auth")
 public class LoginResource {

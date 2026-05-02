@@ -32,7 +32,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .subject(usuario.getUserName())                          // quien es el dueño del token
                 .claim("usuarioId", usuario.getUsuarioId())
-                .claim("rol", usuario.getRol())
+                .claim("rol", usuario.getRol().name())
                 .issuedAt(new Date())                       // fecha de creación
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_MS)) // fecha de expiración
                 .signWith(KEY)                              // firma con HS256
