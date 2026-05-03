@@ -33,5 +33,4 @@ public class LoginService {
         }
         return new LoginResponse(token, usuario);
     }
-
 }

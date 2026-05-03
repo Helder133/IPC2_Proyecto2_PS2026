@@ -145,6 +145,8 @@ CREATE TABLE IF NOT EXISTS cartera_plataforma (
 	saldo DECIMAL(10,2) NOT NULL
 );
 
+SELECT * FROM cartera_plataforma ORDER BY plataforma_id DESC LIMIT 1
+
 CREATE TABLE IF NOT EXISTS transaccion_plataforma (
 	transaccion_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	plataforma_id INT NOT NULL,

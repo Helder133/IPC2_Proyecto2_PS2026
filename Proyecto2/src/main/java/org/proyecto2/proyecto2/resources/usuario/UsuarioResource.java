@@ -8,6 +8,10 @@ import jakarta.ws.rs.core.Response;
 import org.proyecto2.proyecto2.dtos.usuario.UsuarioRequest;
 import org.proyecto2.proyecto2.dtos.usuario.UsuarioResponse;
 import org.proyecto2.proyecto2.dtos.usuario.UsuarioUpdate;
+import org.proyecto2.proyecto2.dtos.usuario.cartera.CarteraPlataformaResponse;
+import org.proyecto2.proyecto2.dtos.usuario.cartera.CarteraRequest;
+import org.proyecto2.proyecto2.dtos.usuario.cartera.CarteraResponse;
+import org.proyecto2.proyecto2.dtos.usuario.cartera.TransaccionResponse;
 import org.proyecto2.proyecto2.dtos.usuario.cliente.ClienteRequest;
 import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerRequest;
 import org.proyecto2.proyecto2.exceptions.EntityAlreadyExistsException;
@@ -101,6 +105,70 @@ public class UsuarioResource {
                     .build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @POST
+    @Secured
+    @Path("/cartera/recarga")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response recargarCartera(@Context ContainerRequestContext request, CarteraRequest carteraRequest) {
+        try {
+            int usuarioId = (int) request.getProperty("usuarioId");
+            String rolUsuario = (String) request.getProperty("rol");
+            UsuarioService usuarioService = new UsuarioService();
+            carteraRequest.setUsuarioId(usuarioId);
+            usuarioService.recargarCartera(EnumUsuario.valueOf(rolUsuario), carteraRequest);
+            return Response.ok("{\"mensaje\": \"Cartera recargada exitosamente\"}").build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @GET
+    @Secured
+    @Path("/cartera")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCartera(@Context ContainerRequestContext request) {
+        try {
+            String rolUsuario = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
+            UsuarioService usuarioService = new UsuarioService();
+            if (EnumUsuario.Administrador.equals(EnumUsuario.valueOf(rolUsuario))) {
+                return Response.ok(new CarteraPlataformaResponse(usuarioService.getCarteraPlataforma())).build();
+            } else {
+                return Response.ok(new CarteraResponse(usuarioService.getCartera(usuarioId))).build();
+            }
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @GET
+    @Secured
+    @Path("/cartera/transaccion")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCarteraTransaccion(@Context ContainerRequestContext request) {
+        try {
+            String rolUsuario = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
+            UsuarioService usuarioService = new UsuarioService();
+            if (EnumUsuario.Administrador.equals(EnumUsuario.valueOf(rolUsuario))) {
+                return Response.ok().build();
+            } else {
+                List<TransaccionResponse> transaccionResponses = usuarioService.getTransaccionesByUsuarioId(usuarioId)
+                        .stream()
+                        .map(TransaccionResponse::new)
+                        .toList();
+                return Response.ok(transaccionResponses).build();
+            }
         } catch (SQLException e) {
             return errorEjecucion(e.getMessage(), 3);
         }

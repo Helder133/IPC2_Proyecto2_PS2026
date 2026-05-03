@@ -142,8 +142,7 @@ public class UsuarioDAO implements CRUD<Usuario> {
         }
     }
 
-    public int insertClienteFreelancer(Usuario usuario) throws SQLException {
-        Connection connection = DBConnection.getInstance().getConnection();
+    public int insertClienteFreelancer(Usuario usuario, Connection connection) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_USUARIO, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, usuario.getNombreCompleto());
             statement.setString(2, usuario.getUserName());

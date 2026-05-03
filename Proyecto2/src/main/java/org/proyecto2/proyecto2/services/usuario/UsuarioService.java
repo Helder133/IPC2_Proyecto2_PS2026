@@ -4,6 +4,7 @@ import org.proyecto2.proyecto2.db.config.DBConnection;
 import org.proyecto2.proyecto2.db.usuario.UsuarioDAO;
 import org.proyecto2.proyecto2.dtos.usuario.UsuarioRequest;
 import org.proyecto2.proyecto2.dtos.usuario.UsuarioUpdate;
+import org.proyecto2.proyecto2.dtos.usuario.cartera.CarteraRequest;
 import org.proyecto2.proyecto2.dtos.usuario.cliente.ClienteRequest;
 import org.proyecto2.proyecto2.dtos.usuario.cliente.ClienteUpdate;
 import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerRequest;
@@ -12,6 +13,12 @@ import org.proyecto2.proyecto2.exceptions.EntityAlreadyExistsException;
 import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
 import org.proyecto2.proyecto2.models.usuario.Usuario;
+import org.proyecto2.proyecto2.models.usuario.cartera.Cartera;
+import org.proyecto2.proyecto2.models.usuario.cartera.CarteraPlataforma;
+import org.proyecto2.proyecto2.models.usuario.cartera.Transaccion;
+import org.proyecto2.proyecto2.services.usuario.cartera.CarteraPlataformaService;
+import org.proyecto2.proyecto2.services.usuario.cartera.CarteraService;
+import org.proyecto2.proyecto2.services.usuario.cartera.TransaccionService;
 import org.proyecto2.proyecto2.services.usuario.cliente.ClienteService;
 import org.proyecto2.proyecto2.services.usuario.freelancer.FreelancerService;
 
@@ -35,8 +42,20 @@ public class UsuarioService {
             throw new EntityAlreadyExistsException("El cui ya està registrado en otro usuario.");
         if (usuarioDAO.validTelefono(usuario.getTelefono()))
             throw new EntityAlreadyExistsException("El teléfono ya està registrado en otro usuario.");
-        int usuarioId = usuarioDAO.insertClienteFreelancer(usuario);
-        usuario.setUsuarioId(usuarioId);
+        Connection connection = DBConnection.getInstance().getConnection();
+        connection.setAutoCommit(false);
+        try {
+            int usuarioId = usuarioDAO.insertClienteFreelancer(usuario, connection);
+            CarteraService carteraService = new CarteraService();
+            carteraService.createCartera(connection, usuarioId);
+            usuario.setUsuarioId(usuarioId);
+            connection.commit();
+        } catch (SQLException ex) {
+            connection.rollback();
+            throw ex;
+        } finally {
+            connection.setAutoCommit(true);
+        }
         return usuario;
     }
 
@@ -150,6 +169,28 @@ public class UsuarioService {
     public void insertComplementoFreelancer(FreelancerRequest freelancerRequest, EnumUsuario rol) throws SQLException, UserDataInvalidException {
         FreelancerService freelancerService = new FreelancerService();
         freelancerService.insertComplemento(freelancerRequest, rol);
+    }
+
+    public void recargarCartera(EnumUsuario rol, CarteraRequest carteraRequest) throws SQLException, UserDataInvalidException {
+        if (EnumUsuario.Administrador.equals(rol))
+            throw new UserDataInvalidException(String.format("Un usuario con rol: %s, no puede recargar una cartera, ya que no cuenta con una, solo los usuarios con rol: %s o %s, pueden recargar.", EnumUsuario.Administrador, EnumUsuario.Cliente, EnumUsuario.Freelancer));
+        CarteraService carteraService = new CarteraService();
+        carteraService.recargarCartera(carteraRequest.getUsuarioId(), carteraRequest.getMonto());
+    }
+
+    public Cartera getCartera(int usuarioId) throws SQLException, UserDataInvalidException {
+        CarteraService carteraService = new CarteraService();
+        return carteraService.getCarteraById(usuarioId);
+    }
+
+    public CarteraPlataforma getCarteraPlataforma() throws SQLException {
+        CarteraPlataformaService carteraPlataformaService = new CarteraPlataformaService();
+        return carteraPlataformaService.getCarteraPlataforma();
+    }
+
+    public List<Transaccion> getTransaccionesByUsuarioId(int usuarioId) throws SQLException {
+        TransaccionService transaccionService = new TransaccionService();
+        return transaccionService.getTransaccionesByUsuarioId(usuarioId);
     }
 
 }
