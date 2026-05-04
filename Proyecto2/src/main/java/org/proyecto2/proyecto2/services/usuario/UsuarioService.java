@@ -166,9 +166,9 @@ public class UsuarioService {
         clienteService.insertComplemento(clienteRequest, rol);
     }
 
-    public void insertComplementoFreelancer(FreelancerRequest freelancerRequest, EnumUsuario rol) throws SQLException, UserDataInvalidException {
+    public void insertComplementoFreelancer(FreelancerRequest freelancerRequest, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException {
         FreelancerService freelancerService = new FreelancerService();
-        freelancerService.insertComplemento(freelancerRequest, rol);
+        freelancerService.insertComplemento(freelancerRequest, rol, usuarioId);
     }
 
     public void recargarCartera(EnumUsuario rol, CarteraRequest carteraRequest) throws SQLException, UserDataInvalidException {

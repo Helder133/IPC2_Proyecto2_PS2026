@@ -3,12 +3,16 @@ package org.proyecto2.proyecto2.models.usuario.freelancer;
 import org.apache.commons.lang3.StringUtils;
 import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerRequest;
 import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerUpdate;
+import org.proyecto2.proyecto2.models.habilidad.Habilidad;
+
+import java.util.List;
 
 public class Freelancer {
     private int usuarioId;
     private String descripcion;
     private EnumFreelancer experiencia;
     private double tarifaHora;
+    private List<Habilidad> habilidades;
 
     public Freelancer(int usuarioId, String descripcion, EnumFreelancer experiencia, double tarifaHora) {
         this.usuarioId = usuarioId;
@@ -63,10 +67,19 @@ public class Freelancer {
         this.tarifaHora = tarifaHora;
     }
 
+    public List<Habilidad> getHabilidades() {
+        return habilidades;
+    }
+
+    public void setHabilidades(List<Habilidad> habilidades) {
+        this.habilidades = habilidades;
+    }
+
     public boolean isValid() {
         return usuarioId > 0
                 && StringUtils.isNotBlank(descripcion)
                 && experiencia != null
-                && tarifaHora > 0;
+                && tarifaHora > 0
+                && !habilidades.isEmpty();
     }
 }

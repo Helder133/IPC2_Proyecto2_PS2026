@@ -9,6 +9,8 @@ import org.proyecto2.proyecto2.models.habilidad.Habilidad;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 
 public class HabilidadService {
     public void createHabilidad(HabilidadRequest habilidadRequest, EnumUsuario rol) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
@@ -33,11 +35,35 @@ public class HabilidadService {
         habilidadDAO.update(habilidad);
     }
 
-    public void updateHabilidadEstado(int habilidadId, EnumUsuario rol) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
+    public void updateHabilidadEstado(int habilidadId, EnumUsuario rol) throws SQLException, UserDataInvalidException {
         if (!EnumUsuario.Administrador.equals(rol))
             throw new UserDataInvalidException("No tienes permisos para actualizar el estado de una habilidad");
         HabilidadDAO habilidadDAO = new HabilidadDAO();
         habilidadDAO.getById(habilidadId).orElseThrow(() -> new UserDataInvalidException("No se encontró la habilidad con ID: " + habilidadId));
         habilidadDAO.updateEstado(habilidadId);
     }
+
+    public Habilidad getHabilidadById(int habilidadId) throws SQLException, UserDataInvalidException {
+        HabilidadDAO habilidadDAO = new HabilidadDAO();
+        Optional<Habilidad> habilidadOptional = habilidadDAO.getById(habilidadId);
+        if (habilidadOptional.isEmpty())
+            throw new UserDataInvalidException("No se encontró la habilidad con ID: " + habilidadId);
+        return habilidadOptional.get();
+    }
+
+    public List<Habilidad> getAllHabilidad() throws SQLException {
+        HabilidadDAO habilidadDAO = new HabilidadDAO();
+        return habilidadDAO.getAll();
+    }
+
+    public List<Habilidad> getAllHabilidadByCoincidence(String nombre) throws SQLException {
+        HabilidadDAO habilidadDAO = new HabilidadDAO();
+        return habilidadDAO.getByCoincidence(nombre);
+    }
+
+    public List<Habilidad> getAllHabilidadActivada() throws SQLException {
+        HabilidadDAO habilidadDAO = new HabilidadDAO();
+        return habilidadDAO.getAllHabilidadActivada();
+    }
+
 }

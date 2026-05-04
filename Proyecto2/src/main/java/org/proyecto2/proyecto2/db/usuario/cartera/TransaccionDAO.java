@@ -41,7 +41,7 @@ public class TransaccionDAO {
                 resultSet.getInt("usuario_id"),
                 EnumTransaccion.valueOf(resultSet.getString("tipo")),
                 resultSet.getDouble("monto"));
-        transaccion.setTransaccionId(resultSet.getInt("transaccion"));
+        transaccion.setTransaccionId(resultSet.getInt("transaccion_id"));
         transaccion.setFecha(resultSet.getDate("fecha").toLocalDate());
         return transaccion;
     }

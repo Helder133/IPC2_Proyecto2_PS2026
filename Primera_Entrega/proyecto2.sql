@@ -56,13 +56,15 @@ CREATE TABLE IF NOT EXISTS cartera (
 );
 
 CREATE TABLE IF NOT EXISTS transaccion (
-	transaccion INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	transaccion_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
 	usuario_id INT NOT NULL,
 	tipo ENUM ('Recarga','Bloqueo','Devolucion','Pago') NOT NULL DEFAULT 'Recarga',
 	monto DECIMAL(10,2) NOT NULL DEFAULT 0.0,
 	fecha DATE NOT NULL,
 	CONSTRAINT fk_cartera FOREIGN KEY (usuario_id) REFERENCES cartera (usuario_id)
 );
+
+ALTER TABLE transaccion RENAME COLUMN transaccion TO transaccion_id;
 
 CREATE TABLE IF NOT EXISTS habilidad (
 	habilidad_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,

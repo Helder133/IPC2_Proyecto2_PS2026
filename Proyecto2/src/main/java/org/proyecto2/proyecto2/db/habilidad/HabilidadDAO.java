@@ -16,11 +16,12 @@ public class HabilidadDAO implements CRUD<Habilidad> {
     private static final String INSERT_HABILIDAD = "INSERT INTO habilidad(nombre, descripcion) VALUES (?, ?)";
     private static final String UPDATE_HABILIDAD = "UPDATE habilidad SET nombre = ?, descripcion = ? WHERE habilidad_id = ?";
     private static final String UPDATE_HABILIDAD_ESTADO = "UPDATE habilidad SET estado = NOT estado WHERE habilidad_id = ?";
-    private static final String GET_HABILIDAD_BY_ID = "SELECT * FROM habilidad WHERE id = ?";
-    private static final String GET_HABILIDAD_BY_COINCIDENCE = "SELECT + FROM habilidad WHERE nombre like ?";
+    private static final String GET_HABILIDAD_BY_ID = "SELECT * FROM habilidad WHERE habilidad_id = ?";
+    private static final String GET_HABILIDAD_BY_COINCIDENCE = "SELECT * FROM habilidad WHERE nombre like ?";
     private static final String GET_ALL_HABILIDAD = "SELECT * FROM habilidad";
     private static final String VALID_NOMBRE = "SELECT 1 FROM habilidad WHERE nombre = ?";
     private static final String VALID_NOMBRE_UPDATE = "SELECT 1 FROM habilidad WHERE nombre = ? AND habilidad_id <> ?";
+    private static final String GET_ALL_HABILIDAD_ACTIVADA = "SELECT * FROM habilidad WHERE estado = 1";
 
     public boolean validNombre(String nombre) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
@@ -103,6 +104,16 @@ public class HabilidadDAO implements CRUD<Habilidad> {
         }
     }
 
+    public List<Habilidad> getAllHabilidadActivada() throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        List<Habilidad> habilidades = new ArrayList<>();
+        try (PreparedStatement select = connection.prepareStatement(GET_ALL_HABILIDAD_ACTIVADA);
+             ResultSet rs = select.executeQuery()) {
+            while (rs.next()) habilidades.add(extraerDatos(rs));
+            return habilidades;
+        }
+    }
+
     public void updateEstado(int usuarioId)  throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
         try (PreparedStatement update = connection.prepareStatement(UPDATE_HABILIDAD_ESTADO)) {
@@ -120,4 +131,5 @@ public class HabilidadDAO implements CRUD<Habilidad> {
         habilidad.setEstado(rs.getBoolean("estado"));
         return habilidad;
     }
+
 }

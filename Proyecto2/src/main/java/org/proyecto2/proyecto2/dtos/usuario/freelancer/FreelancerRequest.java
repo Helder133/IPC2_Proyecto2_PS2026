@@ -2,11 +2,14 @@ package org.proyecto2.proyecto2.dtos.usuario.freelancer;
 
 import org.proyecto2.proyecto2.models.usuario.freelancer.EnumFreelancer;
 
+import java.util.List;
+
 public class FreelancerRequest {
     protected int usuarioId;
     protected String descripcion;
     protected EnumFreelancer experiencia;
     protected double tarifaHora;
+    private List<FreelancerHabilidadRequest> habilidadesRequest;
 
     public int getUsuarioId() {
         return usuarioId;
@@ -38,5 +41,13 @@ public class FreelancerRequest {
 
     public void setTarifaHora(double tarifaHora) {
         this.tarifaHora = tarifaHora;
+    }
+
+    public List<FreelancerHabilidadRequest> getHabilidadesRequest() {
+        return habilidadesRequest;
+    }
+
+    public void setHabilidadesRequest(List<FreelancerHabilidadRequest> habilidadesRequest) {
+        this.habilidadesRequest = habilidadesRequest;
     }
 }

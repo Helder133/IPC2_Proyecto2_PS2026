@@ -98,8 +98,9 @@ public class UsuarioResource {
     public Response createUsuarioComplementoFreelancer(@Context ContainerRequestContext request, FreelancerRequest freelancerRequest) {
         try {
             String rolUsuario = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
             UsuarioService usuarioService = new UsuarioService();
-            usuarioService.insertComplementoFreelancer(freelancerRequest, EnumUsuario.valueOf(rolUsuario));
+            usuarioService.insertComplementoFreelancer(freelancerRequest, EnumUsuario.valueOf(rolUsuario), usuarioId);
             return Response.status(Response.Status.CREATED)
                     .entity("{\"mensaje\": \"Complemento de freelancer agregado exitosamente\"}")
                     .build();
@@ -250,7 +251,7 @@ public class UsuarioResource {
     }
 
     @PUT
-    @Path("/actualizar-estado/{id}")
+    @Path("/actualizar/estado/{id}")
     @Secured
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateUsuarioEstado(@Context ContainerRequestContext request, @PathParam("id") int usuarioId) {
