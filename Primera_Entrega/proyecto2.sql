@@ -64,8 +64,6 @@ CREATE TABLE IF NOT EXISTS transaccion (
 	CONSTRAINT fk_cartera FOREIGN KEY (usuario_id) REFERENCES cartera (usuario_id)
 );
 
-ALTER TABLE transaccion RENAME COLUMN transaccion TO transaccion_id;
-
 CREATE TABLE IF NOT EXISTS habilidad (
 	habilidad_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
 	nombre VARCHAR(100) NOT NULL UNIQUE,
@@ -80,6 +78,12 @@ CREATE TABLE IF NOT EXISTS freelancer_habilidad (
 	CONSTRAINT fk_usuario2 FOREIGN KEY (usuario_id) REFERENCES freelancer (usuario_id),
 	CONSTRAINT fk_habilidad FOREIGN KEY (habilidad_id) REFERENCES habilidad (habilidad_id)
 );
+
+SELECT * FROM usuario;
+SELECT * FROM freelancer;
+SELECT * FROM habilidad;
+SELECT * FROM freelancer_habilidad;
+SELECT h.* FROM freelancer_habilidad fh JOIN habilidad h ON fh.habilidad_id = h.habilidad_id WHERE fh.usuario_id = 3;
 
 CREATE TABLE IF NOT EXISTS categoria (
 	categoria_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,

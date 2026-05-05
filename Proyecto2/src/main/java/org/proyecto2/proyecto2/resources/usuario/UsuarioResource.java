@@ -13,6 +13,7 @@ import org.proyecto2.proyecto2.dtos.usuario.cartera.CarteraRequest;
 import org.proyecto2.proyecto2.dtos.usuario.cartera.CarteraResponse;
 import org.proyecto2.proyecto2.dtos.usuario.cartera.TransaccionResponse;
 import org.proyecto2.proyecto2.dtos.usuario.cliente.ClienteRequest;
+import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerHabilidadRequest;
 import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerRequest;
 import org.proyecto2.proyecto2.exceptions.EntityAlreadyExistsException;
 import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
@@ -26,7 +27,7 @@ import java.util.List;
 
 @Path("/usuario")
 public class UsuarioResource {
-    //Registro publico, cualquiera puede registrarse, pero solo con rol de cliente o freelancer, el admin solo puede ser creado por otro admin
+    //Registro público, cualquiera puede registrarse, pero solo con rol de cliente o freelancer, el admin solo puede ser creado por otro admin
     @POST
     @Path("/cliente-freelancer")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -106,6 +107,8 @@ public class UsuarioResource {
                     .build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
+        } catch (EntityAlreadyExistsException e) {
+            return errorEjecucion(e.getMessage(), 2);
         } catch (SQLException e) {
             return errorEjecucion(e.getMessage(), 3);
         }
@@ -126,6 +129,27 @@ public class UsuarioResource {
             return Response.ok("{\"mensaje\": \"Cartera recargada exitosamente\"}").build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @POST
+    @Secured
+    @Path("/freelacner/habilidad")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response agregarHabilidad(@Context ContainerRequestContext request, FreelancerHabilidadRequest freelancerHabilidadRequest) {
+        try {
+            String rol = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
+            UsuarioService usuarioService = new UsuarioService();
+            usuarioService.agregarHabilidadAFreelancer(freelancerHabilidadRequest, EnumUsuario.valueOf(rol), usuarioId);
+            return Response.status(Response.Status.CREATED).entity("{\"mensaje\": \"Habilidad agregada exitosamente\"}").build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (EntityAlreadyExistsException e) {
+            return errorEjecucion(e.getMessage(), 2);
         } catch (SQLException e) {
             return errorEjecucion(e.getMessage(), 3);
         }
@@ -260,6 +284,24 @@ public class UsuarioResource {
             UsuarioService usuarioService = new UsuarioService();
             usuarioService.updateUsuarioEstado(usuarioId, EnumUsuario.valueOf(rolUsuario));
             return Response.ok("{\"mensaje\": \"Estado del usuario actualizado exitosamente\"}").build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @DELETE
+    @Secured
+    @Path("/freelancer/habilidad/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteFreelancerHabilidad(@PathParam("id") int habilidadId, @Context ContainerRequestContext request) {
+        try {
+            String rolUsuario = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
+            UsuarioService usuarioService = new UsuarioService();
+            usuarioService.deleteHabilidadAFreelancer(habilidadId, usuarioId, EnumUsuario.valueOf(rolUsuario));
+            return Response.status(Response.Status.NO_CONTENT).build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
         } catch (SQLException e) {

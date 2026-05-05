@@ -28,6 +28,16 @@ public class FreelancerDAO implements CRUD<Freelancer> {
         }
     }
 
+    public void insert(Freelancer freelancer, Connection connection) throws SQLException {
+        try (PreparedStatement insert = connection.prepareStatement(INSERT_COMPLEMENTO)) {
+            insert.setInt(1, freelancer.getUsuarioId());
+            insert.setString(2, freelancer.getDescripcion());
+            insert.setString(3, freelancer.getExperiencia().name());
+            insert.setDouble(4, freelancer.getTarifaHora());
+            insert.executeUpdate();
+        }
+    }
+
     @Override
     public void insert(Freelancer freelancer) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();

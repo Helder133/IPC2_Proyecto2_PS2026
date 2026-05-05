@@ -114,7 +114,7 @@ public class HabilidadDAO implements CRUD<Habilidad> {
         }
     }
 
-    public void updateEstado(int usuarioId)  throws SQLException {
+    public void updateEstado(int usuarioId) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
         try (PreparedStatement update = connection.prepareStatement(UPDATE_HABILIDAD_ESTADO)) {
             update.setInt(1, usuarioId);

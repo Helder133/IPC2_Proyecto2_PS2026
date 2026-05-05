@@ -79,7 +79,6 @@ public class Freelancer {
         return usuarioId > 0
                 && StringUtils.isNotBlank(descripcion)
                 && experiencia != null
-                && tarifaHora > 0
-                && !habilidades.isEmpty();
+                && tarifaHora > 0;
     }
 }

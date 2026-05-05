@@ -28,6 +28,14 @@ public class FreelancerHabilidadDAO {
         }
     }
 
+    public void insert(FreelancerHabilidad freelancerHabilidad, Connection connection) throws SQLException {
+        try (PreparedStatement insert = connection.prepareStatement(INSERT)) {
+            insert.setInt(1, freelancerHabilidad.getUsuarioId());
+            insert.setInt(2, freelancerHabilidad.getHabilidadId());
+            insert.executeUpdate();
+        }
+    }
+
     public void insert(FreelancerHabilidad freelancerHabilidad) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
         try (PreparedStatement insert = connection.prepareStatement(INSERT)) {

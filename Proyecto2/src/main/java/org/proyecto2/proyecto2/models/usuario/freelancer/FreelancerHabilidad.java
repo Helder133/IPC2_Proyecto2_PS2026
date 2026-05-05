@@ -11,6 +11,11 @@ public class FreelancerHabilidad {
         this.usuarioId = usuarioId;
     }
 
+    public FreelancerHabilidad(int habilidadId, int usuarioId) {
+        this.habilidadId = habilidadId;
+        this.usuarioId = usuarioId;
+    }
+
     public int getUsuarioId() {
         return usuarioId;
     }

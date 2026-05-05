@@ -7,6 +7,7 @@ import org.proyecto2.proyecto2.dtos.usuario.UsuarioUpdate;
 import org.proyecto2.proyecto2.dtos.usuario.cartera.CarteraRequest;
 import org.proyecto2.proyecto2.dtos.usuario.cliente.ClienteRequest;
 import org.proyecto2.proyecto2.dtos.usuario.cliente.ClienteUpdate;
+import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerHabilidadRequest;
 import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerRequest;
 import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerUpdate;
 import org.proyecto2.proyecto2.exceptions.EntityAlreadyExistsException;
@@ -16,10 +17,12 @@ import org.proyecto2.proyecto2.models.usuario.Usuario;
 import org.proyecto2.proyecto2.models.usuario.cartera.Cartera;
 import org.proyecto2.proyecto2.models.usuario.cartera.CarteraPlataforma;
 import org.proyecto2.proyecto2.models.usuario.cartera.Transaccion;
+import org.proyecto2.proyecto2.models.usuario.freelancer.FreelancerHabilidad;
 import org.proyecto2.proyecto2.services.usuario.cartera.CarteraPlataformaService;
 import org.proyecto2.proyecto2.services.usuario.cartera.CarteraService;
 import org.proyecto2.proyecto2.services.usuario.cartera.TransaccionService;
 import org.proyecto2.proyecto2.services.usuario.cliente.ClienteService;
+import org.proyecto2.proyecto2.services.usuario.freelancer.FreelancerHabilidadService;
 import org.proyecto2.proyecto2.services.usuario.freelancer.FreelancerService;
 
 import java.sql.Connection;
@@ -166,7 +169,7 @@ public class UsuarioService {
         clienteService.insertComplemento(clienteRequest, rol);
     }
 
-    public void insertComplementoFreelancer(FreelancerRequest freelancerRequest, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException {
+    public void insertComplementoFreelancer(FreelancerRequest freelancerRequest, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException,EntityAlreadyExistsException {
         FreelancerService freelancerService = new FreelancerService();
         freelancerService.insertComplemento(freelancerRequest, rol, usuarioId);
     }
@@ -191,6 +194,16 @@ public class UsuarioService {
     public List<Transaccion> getTransaccionesByUsuarioId(int usuarioId) throws SQLException {
         TransaccionService transaccionService = new TransaccionService();
         return transaccionService.getTransaccionesByUsuarioId(usuarioId);
+    }
+
+    public void agregarHabilidadAFreelancer(FreelancerHabilidadRequest freelancerHabilidadRequest, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
+        FreelancerHabilidadService freelancerHabilidadService = new FreelancerHabilidadService();
+        freelancerHabilidadService.insert(freelancerHabilidadRequest, rol, usuarioId);
+    }
+
+    public void deleteHabilidadAFreelancer(int habilidadId, int usuarioId, EnumUsuario rol) throws SQLException, UserDataInvalidException {
+        FreelancerHabilidadService freelancerHabilidadService = new FreelancerHabilidadService();
+        freelancerHabilidadService.delete(habilidadId,rol,usuarioId);
     }
 
 }
