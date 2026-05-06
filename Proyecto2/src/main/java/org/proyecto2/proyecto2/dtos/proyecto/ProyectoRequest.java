@@ -1,0 +1,87 @@
+package org.proyecto2.proyecto2.dtos.proyecto;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import org.proyecto2.proyecto2.models.proyecto.EnumProyecto;
+
+import java.time.LocalDate;
+
+public class ProyectoRequest {
+    protected int usuarioId;
+    protected int categoriaId;
+    protected String titulo;
+    protected String descripcion;
+    protected double presupuesto;
+    protected EnumProyecto estado;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    protected LocalDate fechaCreacion;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    protected LocalDate fechaLimite;
+
+    public int getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(int usuarioId) {
+        this.usuarioId = usuarioId;
+    }
+
+    public int getCategoriaId() {
+        return categoriaId;
+    }
+
+    public void setCategoriaId(int categoriaId) {
+        this.categoriaId = categoriaId;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public double getPresupuesto() {
+        return presupuesto;
+    }
+
+    public void setPresupuesto(double presupuesto) {
+        this.presupuesto = presupuesto;
+    }
+
+    public EnumProyecto getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EnumProyecto estado) {
+        this.estado = estado;
+    }
+
+    public LocalDate getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDate fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public LocalDate getFechaLimite() {
+        return fechaLimite;
+    }
+
+    public void setFechaLimite(LocalDate fechaLimite) {
+        this.fechaLimite = fechaLimite;
+    }
+}
