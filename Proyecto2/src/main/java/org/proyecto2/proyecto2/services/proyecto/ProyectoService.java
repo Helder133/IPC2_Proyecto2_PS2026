@@ -14,16 +14,17 @@ import java.util.List;
 import java.util.Optional;
 
 public class ProyectoService {
-    public void createProyecto(ProyectoRequest proyectoRequest, EnumUsuario rol) throws SQLException, UserDataInvalidException {
+    public void createProyecto(ProyectoRequest proyectoRequest, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException {
         if (!EnumUsuario.Cliente.equals(rol))
             throw new UserDataInvalidException("El usuario no tiene permisos para crear un proyecto.");
         Proyecto proyecto = new Proyecto(proyectoRequest);
         if (!proyecto.isValid()) throw new UserDataInvalidException("Los datos del proyecto no son válidos.");
+        proyecto.setUsuarioId(usuarioId);
         ProyectoDAO proyectoDAO = new ProyectoDAO();
         proyectoDAO.insert(proyecto);
     }
 
-    public void updateProyecto(ProyectoUpdate proyectoUpdate, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
+    public void updateProyecto(ProyectoUpdate proyectoUpdate, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException {
         if (!EnumUsuario.Cliente.equals(rol))
             throw new UserDataInvalidException("El usuario no tiene permisos para actualizar un proyecto.");
         Proyecto proyecto = new Proyecto(proyectoUpdate);
@@ -67,8 +68,22 @@ public class ProyectoService {
 
     public Proyecto getUsuarioProyectoById(int usuarioId, int proyectoId) throws SQLException, UserDataInvalidException {
         ProyectoDAO proyectoDAO = new ProyectoDAO();
-        Optional<Proyecto> proyecto = proyectoDAO.getUsuarioProyectoById(usuarioId, proyectoId);
+        Optional<Proyecto> proyecto = proyectoDAO.getUsuarioProyectoById(proyectoId, usuarioId);
         if (proyecto.isEmpty()) throw new UserDataInvalidException("El proyecto no existe o no pertenece al usuario.");
         return proyecto.get();
+    }
+
+    public List<Proyecto> getAllProyectoByCategoria(int categoriaId, EnumUsuario rol) throws SQLException, UserDataInvalidException {
+        if (EnumUsuario.Administrador.equals(rol))
+            throw new UserDataInvalidException("El usuario no tiene permisos para obtener los proyectos por categoría.");
+        ProyectoDAO proyectoDAO = new ProyectoDAO();
+        return proyectoDAO.getAllProyectoByCategoria(categoriaId);
+    }
+
+    public List<Proyecto> getAllProyectoByPresupuesto(double precioInicial, double precioFinal, EnumUsuario rol) throws SQLException, UserDataInvalidException {
+        if (!EnumUsuario.Freelancer.equals(rol))
+            throw new UserDataInvalidException("El usuario no tiene permisos para obtener los proyectos por presupuesto.");
+        ProyectoDAO proyectoDAO = new ProyectoDAO();
+        return proyectoDAO.getAllProyectoByPresupuesto(precioInicial, precioFinal);
     }
 }

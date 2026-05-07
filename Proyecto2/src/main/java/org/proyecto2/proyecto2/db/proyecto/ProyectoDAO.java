@@ -18,8 +18,10 @@ public class ProyectoDAO implements CRUD<Proyecto> {
     private static final String GET_ALL_USUARIO_PROYECTO_BY_COINCIDENCE = "SELECT * FROM proyecto WHERE titulo like ? AND usuario_id = ?";
     private static final String GET_USUARIO_PROYECTO_BY_ID = "SELECT * FROM proyecto WHERE proyecto_id = ? AND usuario_id = ?";
     private static final String GET_ALL_PROYECTO = "SELECT * FROM proyecto";
-    private static final String GET_PROYECTO_BY_ID = "SELECT * FROM proyecto WHERE id = ?";
+    private static final String GET_PROYECTO_BY_ID = "SELECT * FROM proyecto WHERE proyecto_id = ?";
     private static final String VALID_PROYECTO = "SELECT 1 FROM proyecto WHERE proyecto_id = ? AND usuario_id = ?";
+    private static final String GET_ALL_PROYECTO_BY_CATEGORIA = "SELECT * FROM proyecto WHERE categoria_id = ?";
+    private static final String GET_ALL_PROYECTO_BY_PRESUPUESTO = "SELECT * FROM proyecto WHERE presupuesto BETWEEN ? AND ?";
 
     public boolean existsProyecto(int proyectoId, int usuarioId) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
@@ -135,6 +137,32 @@ public class ProyectoDAO implements CRUD<Proyecto> {
                 if (rs.next()) return Optional.of(extraerDatos(rs));
                 return Optional.empty();
             }
+        }
+    }
+
+    public List<Proyecto> getAllProyectoByCategoria(int categoriaId) throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        List<Proyecto> proyectos = new ArrayList<>();
+        try (PreparedStatement select = connection.prepareStatement(GET_ALL_PROYECTO_BY_CATEGORIA)) {
+            select.setInt(1, categoriaId);
+            try (ResultSet rs = select.executeQuery()) {
+                while (rs.next()) proyectos.add(extraerDatos(rs));
+                return proyectos;
+            }
+        }
+    }
+
+    public List<Proyecto> getAllProyectoByPresupuesto(double precioInicial, double precioFinal) throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        List<Proyecto> proyectos = new ArrayList<>();
+        try (PreparedStatement select = connection.prepareStatement(GET_ALL_PROYECTO_BY_PRESUPUESTO)) {
+            select.setDouble(1, precioInicial);
+            select.setDouble(2, precioFinal);
+            try (ResultSet rs = select.executeQuery()) {
+                while (rs.next()) proyectos.add(extraerDatos(rs));
+                return proyectos;
+            }
+
         }
     }
 

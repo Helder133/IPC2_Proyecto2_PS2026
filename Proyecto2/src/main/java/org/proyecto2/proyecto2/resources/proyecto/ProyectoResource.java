@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.proyecto2.proyecto2.dtos.proyecto.ProyectoRequest;
 import org.proyecto2.proyecto2.dtos.proyecto.ProyectoResponse;
+import org.proyecto2.proyecto2.dtos.proyecto.ProyectoUpdate;
 import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
 import org.proyecto2.proyecto2.models.proyecto.Proyecto;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
@@ -27,8 +28,9 @@ public class ProyectoResource {
     public Response createProyecto(ProyectoRequest proyectoRequest, @Context ContainerRequestContext request) {
         try {
             String rol = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
             ProyectoService proyectoService = new ProyectoService();
-            proyectoService.createProyecto(proyectoRequest, EnumUsuario.valueOf(rol));
+            proyectoService.createProyecto(proyectoRequest, EnumUsuario.valueOf(rol),  usuarioId);
             return Response.status(Response.Status.CREATED)
                     .entity("{\"message\": \"Proyecto creada exitosamente\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -40,6 +42,7 @@ public class ProyectoResource {
         }
     }
 
+    // EndPoint del freelancer
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllProyectos() {
@@ -70,6 +73,27 @@ public class ProyectoResource {
         }
     }
 
+    @GET
+    @Secured
+    @Path("/presupuesto/{inicio}/{fin}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProyectoByPresupuesto(@PathParam("inicio") double inicio, @PathParam("fin") double fin, @Context ContainerRequestContext request) {
+        try {
+            String rol = (String) request.getProperty("rol");
+            ProyectoService proyectoService = new ProyectoService();
+            List<ProyectoResponse> proyectoResponses = proyectoService.getAllProyectoByPresupuesto(inicio, fin, EnumUsuario.valueOf(rol))
+                    .stream()
+                    .map(ProyectoResponse::new)
+                    .toList();
+            return Response.ok(proyectoResponses).build();
+        }  catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    // EndPoint para el cliente
     @GET
     @Path("/usuario")
     @Secured
@@ -108,7 +132,7 @@ public class ProyectoResource {
 
     @GET
     @Secured
-    @Path("/{proyectoId}/usuario}")
+    @Path("/{proyectoId}/usuario")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUsuarioProyectoById(@Context ContainerRequestContext request, @PathParam("proyectoId") int proyectoId) {
         try {
@@ -116,6 +140,47 @@ public class ProyectoResource {
             ProyectoService proyectoService = new ProyectoService();
             Proyecto proyecto = proyectoService.getUsuarioProyectoById(usuarioId, proyectoId);
             return Response.ok(new ProyectoResponse(proyecto)).build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    // endpoint para freelancer y cliente
+    @GET
+    @Secured
+    @Path("/categoria/{categoriaId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProyectoByCategoria(@PathParam("categoriaId") int categoriaId,  @Context ContainerRequestContext request) {
+        try {
+            int usuarioId = (int) request.getProperty("usuarioId");
+            String rol = (String) request.getProperty("rol");
+            ProyectoService proyectoService = new ProyectoService();
+            List<ProyectoResponse> proyectoResponses = proyectoService.getAllProyectoByCategoria(categoriaId, EnumUsuario.valueOf(rol))
+                    .stream()
+                    .map(ProyectoResponse::new)
+                    .toList();
+            return Response.ok(proyectoResponses).build();
+        }  catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @PUT
+    @Secured
+    @Path("/actualizar")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response actualizarProyecto(@Context ContainerRequestContext request, ProyectoUpdate proyectoUpdate) {
+        try {
+            int usuarioId = (int) request.getProperty("usuarioId");
+            String rol = (String) request.getProperty("rol");
+            ProyectoService proyectoService = new ProyectoService();
+            proyectoService.updateProyecto(proyectoUpdate, EnumUsuario.valueOf(rol), usuarioId);
+            return Response.ok("{\"message\": \"Proyecto actualizado exitosamente\"}").build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
         } catch (SQLException e) {

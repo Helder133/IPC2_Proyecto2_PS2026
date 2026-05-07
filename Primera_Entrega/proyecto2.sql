@@ -81,6 +81,9 @@ CREATE TABLE IF NOT EXISTS freelancer_habilidad (
 
 SELECT * FROM usuario;
 SELECT * FROM freelancer;
+SELECT * FROM cliente;
+SELECT * FROM categoria;
+SELECT * FROM proyecto;
 SELECT * FROM habilidad;
 SELECT * FROM freelancer_habilidad;
 SELECT h.* FROM freelancer_habilidad fh JOIN habilidad h ON fh.habilidad_id = h.habilidad_id WHERE fh.usuario_id = 3;
