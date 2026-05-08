@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import org.proyecto2.proyecto2.models.proyecto.EnumProyecto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class ProyectoRequest {
     protected int usuarioId;
@@ -20,6 +21,7 @@ public class ProyectoRequest {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     protected LocalDate fechaLimite;
+    private List<ProyectoHabilidadRequest> proyectoHabilidadRequest;
 
     public int getUsuarioId() {
         return usuarioId;
@@ -83,5 +85,13 @@ public class ProyectoRequest {
 
     public void setFechaLimite(LocalDate fechaLimite) {
         this.fechaLimite = fechaLimite;
+    }
+
+    public List<ProyectoHabilidadRequest> getProyectoHabilidadRequest() {
+        return proyectoHabilidadRequest;
+    }
+
+    public void setProyectoHabilidadRequest(List<ProyectoHabilidadRequest> proyectoHabilidadRequest) {
+        this.proyectoHabilidadRequest = proyectoHabilidadRequest;
     }
 }

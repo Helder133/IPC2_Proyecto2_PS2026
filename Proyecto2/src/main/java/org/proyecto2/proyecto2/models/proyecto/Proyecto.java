@@ -3,8 +3,11 @@ package org.proyecto2.proyecto2.models.proyecto;
 import org.apache.commons.lang3.StringUtils;
 import org.proyecto2.proyecto2.dtos.proyecto.ProyectoRequest;
 import org.proyecto2.proyecto2.dtos.proyecto.ProyectoUpdate;
+import org.proyecto2.proyecto2.models.categoria.Categoria;
+import org.proyecto2.proyecto2.models.habilidad.Habilidad;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class Proyecto {
     private int proyectoId;
@@ -16,8 +19,10 @@ public class Proyecto {
     private EnumProyecto estado;
     private LocalDate fechaCreacion;
     private LocalDate fechaLimite;
+    private Categoria categoria;
+    private List<Habilidad>  habilidades;
 
-    public Proyecto(int proyectoId, int usuarioId, int categoriaId, String titulo, String descripcion, double presupuesto, EnumProyecto estado, LocalDate fechaCreacion, LocalDate fechaLimite) {
+    public Proyecto(int proyectoId, int usuarioId, int categoriaId, String titulo, String descripcion, double presupuesto, EnumProyecto estado, LocalDate fechaCreacion, LocalDate fechaLimite, Categoria categoria) {
         this.proyectoId = proyectoId;
         this.usuarioId = usuarioId;
         this.categoriaId = categoriaId;
@@ -27,6 +32,7 @@ public class Proyecto {
         this.estado = estado;
         this.fechaCreacion = fechaCreacion;
         this.fechaLimite = fechaLimite;
+        this.categoria = categoria;
     }
 
     public Proyecto(ProyectoRequest proyectoRequest) {
@@ -120,6 +126,22 @@ public class Proyecto {
 
     public void setFechaLimite(LocalDate fechaLimite) {
         this.fechaLimite = fechaLimite;
+    }
+
+    public List<Habilidad> getHabilidades() {
+        return habilidades;
+    }
+
+    public void setHabilidades(List<Habilidad> habilidades) {
+        this.habilidades = habilidades;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
     }
 
     public boolean isValid() {

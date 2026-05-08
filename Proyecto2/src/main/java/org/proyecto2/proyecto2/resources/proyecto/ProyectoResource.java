@@ -5,6 +5,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.proyecto2.proyecto2.dtos.proyecto.ProyectoHabilidadRequest;
 import org.proyecto2.proyecto2.dtos.proyecto.ProyectoRequest;
 import org.proyecto2.proyecto2.dtos.proyecto.ProyectoResponse;
 import org.proyecto2.proyecto2.dtos.proyecto.ProyectoUpdate;
@@ -35,6 +36,25 @@ public class ProyectoResource {
                     .entity("{\"message\": \"Proyecto creada exitosamente\"}")
                     .type(MediaType.APPLICATION_JSON)
                     .build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @POST
+    @Secured
+    @Path("/{proyectoId}/habilidad")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response agregarHabilidadProyecto(@Context ContainerRequestContext request, @PathParam("proyectoId") int proyectoId, ProyectoHabilidadRequest proyectoHabilidadRequest) {
+        try {
+            String rol = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
+            ProyectoService proyectoService = new ProyectoService();
+            proyectoService.insertProyectoHabilidad(proyectoHabilidadRequest, EnumUsuario.valueOf(rol), usuarioId, proyectoId);
+            return Response.ok("{\"message\": \"Habilidad agregada al proyecto exitosamente\"}").build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
         } catch (SQLException e) {
@@ -154,7 +174,6 @@ public class ProyectoResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProyectoByCategoria(@PathParam("categoriaId") int categoriaId,  @Context ContainerRequestContext request) {
         try {
-            int usuarioId = (int) request.getProperty("usuarioId");
             String rol = (String) request.getProperty("rol");
             ProyectoService proyectoService = new ProyectoService();
             List<ProyectoResponse> proyectoResponses = proyectoService.getAllProyectoByCategoria(categoriaId, EnumUsuario.valueOf(rol))
@@ -181,6 +200,24 @@ public class ProyectoResource {
             ProyectoService proyectoService = new ProyectoService();
             proyectoService.updateProyecto(proyectoUpdate, EnumUsuario.valueOf(rol), usuarioId);
             return Response.ok("{\"message\": \"Proyecto actualizado exitosamente\"}").build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @DELETE
+    @Secured
+    @Path("/eliminar/{proyectoId}/habilidad/{habilidadId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response eliminarProyecto( @PathParam("proyectoId") int proyectoId, @PathParam("habilidadId") int habilidadId, @Context ContainerRequestContext request) {
+        try {
+            int usuarioId = (int) request.getProperty("usuarioId");
+            String rol = (String) request.getProperty("rol");
+            ProyectoService proyectoService = new ProyectoService();
+            proyectoService.deleteProyectoUsuario(usuarioId, proyectoId, habilidadId, EnumUsuario.valueOf(rol));
+            return Response.ok("{\"message\": \"Habilidad eliminado del proyecto exitosamente\"}").build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
         } catch (SQLException e) {

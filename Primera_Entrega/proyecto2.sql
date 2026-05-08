@@ -30,7 +30,7 @@ INSERT INTO usuario (nombre_completo,user_name,password,email,telefono,direccion
 
 SELECT * FROM usuario WHERE (user_name = 'Admin' OR email = 'Admin') AND password = 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3' AND estado = 1;
 
-SELECT u.*, c.*, f.* FROM usuario u LEFT JOIN cliente c ON u.usuario_id = c.usuario_id LEFT JOIN freelancer f ON u.usuario_id = f.usuario_id;
+SELECT u.nombre_completo, u.user_name,   c.*, f.* FROM usuario u LEFT JOIN cliente c ON u.usuario_id = c.usuario_id LEFT JOIN freelancer f ON u.usuario_id = f.usuario_id;
 
 CREATE TABLE IF NOT EXISTS cliente (
 	usuario_id INT PRIMARY KEY NOT NULL,
@@ -85,6 +85,7 @@ SELECT * FROM cliente;
 SELECT * FROM categoria;
 SELECT * FROM proyecto;
 SELECT * FROM habilidad;
+SELECT * FROM proyecto_habilidad;
 SELECT * FROM freelancer_habilidad;
 SELECT h.* FROM freelancer_habilidad fh JOIN habilidad h ON fh.habilidad_id = h.habilidad_id WHERE fh.usuario_id = 3;
 
@@ -117,6 +118,10 @@ CREATE TABLE IF NOT EXISTS proyecto_habilidad (
 	CONSTRAINT fk_habilidad2 FOREIGN KEY (habilidad_id) REFERENCES habilidad (habilidad_id)
 );
 
+SELECT p.*, c.nombre, c.descripcion, c.estado FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id;
+SELECT h.* FROM proyecto_habilidad ph JOIN habilidad h ON ph.habilidad_id = h.habilidad_id WHERE ph.proyecto_id = 1; 
+SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE proyecto_id = 12 AND usuario_id = 5
+
 CREATE TABLE IF NOT EXISTS propuesta (
 	propuesta_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	proyecto_id INT NOT NULL,
@@ -129,6 +134,8 @@ CREATE TABLE IF NOT EXISTS propuesta (
 	CONSTRAINT fk_proyecto2 FOREIGN KEY (proyecto_id) REFERENCES proyecto (proyecto_id),
 	CONSTRAINT fk_freelancer2 FOREIGN KEY (usuario_id) REFERENCES freelancer (usuario_id)
 );
+
+SELECT u.*, f.*, p.* FROM propuesta p JOIN usuario u ON p.usuario_id = u.usuario_id JOIN freelancer f ON u.usuario_id = f.usuario_id;
 
 CREATE TABLE IF NOT EXISTS contrato (
 	contrato_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -186,7 +193,7 @@ CREATE TABLE IF NOT EXISTS configuracion_sistema (
 );
 
 
-
+SELECT p.propuesta_id, p.proyecto_id, p.monto, p.tiempo_entrega, p.descripcion, p.estado, p.fecha_creacion, u.usuario_id, u.nombre_completo, u.user_name, COALESCE(cal.promedio_calificacion, 0) AS promedio_calificacion, COALESCE(cal.total_calificaciones, 0) AS total_calificaciones FROM propuesta p INNER JOIN usuario u ON p.usuario_id = u.usuario_id LEFT JOIN (SELECT p2.usuario_id, COUNT(c.calificacion) AS total_calificaciones, AVG(c.calificacion) AS promedio_calificacion FROM propuesta p2 INNER JOIN contrato c ON p2.propuesta_id = c.propuesta_id GROUP BY p2.usuario_id) cal ON p.usuario_id = cal.usuario_id WHERE p.proyecto_id = 1;
 
 
 

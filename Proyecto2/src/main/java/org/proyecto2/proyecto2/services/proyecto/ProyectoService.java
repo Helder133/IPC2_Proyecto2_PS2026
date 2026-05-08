@@ -1,14 +1,17 @@
 package org.proyecto2.proyecto2.services.proyecto;
 
+import org.proyecto2.proyecto2.db.config.DBConnection;
 import org.proyecto2.proyecto2.db.proyecto.ProyectoDAO;
+import org.proyecto2.proyecto2.dtos.proyecto.ProyectoHabilidadRequest;
 import org.proyecto2.proyecto2.dtos.proyecto.ProyectoRequest;
 import org.proyecto2.proyecto2.dtos.proyecto.ProyectoUpdate;
-import org.proyecto2.proyecto2.exceptions.EntityAlreadyExistsException;
 import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
+import org.proyecto2.proyecto2.models.habilidad.Habilidad;
 import org.proyecto2.proyecto2.models.proyecto.EnumProyecto;
 import org.proyecto2.proyecto2.models.proyecto.Proyecto;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +24,21 @@ public class ProyectoService {
         if (!proyecto.isValid()) throw new UserDataInvalidException("Los datos del proyecto no son válidos.");
         proyecto.setUsuarioId(usuarioId);
         ProyectoDAO proyectoDAO = new ProyectoDAO();
-        proyectoDAO.insert(proyecto);
+        Connection connection = DBConnection.getInstance().getConnection();
+        connection.setAutoCommit(false);
+        try {
+            int proyectoId = proyectoDAO.insert(proyecto, connection);
+            for (ProyectoHabilidadRequest proyectoHabilidadRequest : proyectoRequest.getProyectoHabilidadRequest()) {
+                ProyectoHabilidadService proyectoHabilidadService = new ProyectoHabilidadService();
+                proyectoHabilidadService.insertProyectoHabilidad(proyectoHabilidadRequest, rol, usuarioId, proyectoId, connection);
+            }
+            connection.commit();
+        } catch (SQLException | UserDataInvalidException e) {
+            connection.rollback();
+            throw e;
+        } finally {
+            connection.setAutoCommit(true);
+        }
     }
 
     public void updateProyecto(ProyectoUpdate proyectoUpdate, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException {
@@ -44,32 +61,51 @@ public class ProyectoService {
         proyectoDAO.updateEstado(estado, proyectoId);
     }
 
+    private List<Habilidad> extraerHabilidades(int proyectoId) throws SQLException, UserDataInvalidException {
+        ProyectoHabilidadService proyectoHabilidadService = new ProyectoHabilidadService();
+        return proyectoHabilidadService.getAllHabilidadesByProyecto(proyectoId);
+    }
+
     public Proyecto getById(int proyectoId) throws SQLException, UserDataInvalidException {
         ProyectoDAO proyectoDAO = new ProyectoDAO();
         Optional<Proyecto> proyecto = proyectoDAO.getById(proyectoId);
         if (proyecto.isEmpty()) throw new UserDataInvalidException("El proyecto no existe.");
+        proyecto.get().setHabilidades(extraerHabilidades(proyecto.get().getProyectoId()));
         return proyecto.get();
     }
 
     public List<Proyecto> getAll() throws SQLException {
         ProyectoDAO proyectoDAO = new ProyectoDAO();
-        return proyectoDAO.getAll();
+        List<Proyecto> proyectos = proyectoDAO.getAll();
+        for (Proyecto proyecto : proyectos) {
+            proyecto.setHabilidades(extraerHabilidades(proyecto.getProyectoId()));
+        }
+        return proyectos;
     }
 
     public List<Proyecto> getAllUsuarioProyecto(int usuarioId) throws SQLException {
         ProyectoDAO proyectoDAO = new ProyectoDAO();
-        return proyectoDAO.getAllUsuarioProyecto(usuarioId);
+        List<Proyecto> proyectos = proyectoDAO.getAllUsuarioProyecto(usuarioId);
+        for (Proyecto proyecto : proyectos) {
+            proyecto.setHabilidades(extraerHabilidades(proyecto.getProyectoId()));
+        }
+        return proyectos;
     }
 
     public List<Proyecto> getAllUsuarioProyectoByCoincidence(int usuarioId, String titulo) throws SQLException {
         ProyectoDAO proyectoDAO = new ProyectoDAO();
-        return proyectoDAO.getAllUsuarioProyectoByCategoria(usuarioId, titulo);
+        List<Proyecto> proyectos = proyectoDAO.getAllUsuarioProyectoByCategoria(usuarioId, titulo);
+        for (Proyecto proyecto : proyectos) {
+            proyecto.setHabilidades(extraerHabilidades(proyecto.getProyectoId()));
+        }
+        return proyectos;
     }
 
     public Proyecto getUsuarioProyectoById(int usuarioId, int proyectoId) throws SQLException, UserDataInvalidException {
         ProyectoDAO proyectoDAO = new ProyectoDAO();
         Optional<Proyecto> proyecto = proyectoDAO.getUsuarioProyectoById(proyectoId, usuarioId);
         if (proyecto.isEmpty()) throw new UserDataInvalidException("El proyecto no existe o no pertenece al usuario.");
+        proyecto.get().setHabilidades(extraerHabilidades(proyecto.get().getProyectoId()));
         return proyecto.get();
     }
 
@@ -77,13 +113,41 @@ public class ProyectoService {
         if (EnumUsuario.Administrador.equals(rol))
             throw new UserDataInvalidException("El usuario no tiene permisos para obtener los proyectos por categoría.");
         ProyectoDAO proyectoDAO = new ProyectoDAO();
-        return proyectoDAO.getAllProyectoByCategoria(categoriaId);
+        List<Proyecto> proyectos = proyectoDAO.getAllProyectoByCategoria(categoriaId);
+        for (Proyecto proyecto : proyectos) {
+            proyecto.setHabilidades(extraerHabilidades(proyecto.getProyectoId()));
+        }
+        return proyectos;
     }
 
     public List<Proyecto> getAllProyectoByPresupuesto(double precioInicial, double precioFinal, EnumUsuario rol) throws SQLException, UserDataInvalidException {
         if (!EnumUsuario.Freelancer.equals(rol))
             throw new UserDataInvalidException("El usuario no tiene permisos para obtener los proyectos por presupuesto.");
         ProyectoDAO proyectoDAO = new ProyectoDAO();
-        return proyectoDAO.getAllProyectoByPresupuesto(precioInicial, precioFinal);
+        List<Proyecto> proyectos = proyectoDAO.getAllProyectoByPresupuesto(precioInicial, precioFinal);
+        for (Proyecto proyecto : proyectos) {
+            proyecto.setHabilidades(extraerHabilidades(proyecto.getProyectoId()));
+        }
+        return proyectos;
+    }
+
+    public void deleteProyectoUsuario(int usuarioId, int proyectoId, int habilidadId, EnumUsuario rol) throws SQLException, UserDataInvalidException {
+        ProyectoHabilidadService  proyectoHabilidadService = new ProyectoHabilidadService();
+        proyectoHabilidadService.delete(habilidadId, rol, usuarioId, proyectoId);
+    }
+
+    public void insertProyectoHabilidad(ProyectoHabilidadRequest proyectoHabilidadRequest, EnumUsuario rol, int usuarioId, int proyectoId) throws SQLException, UserDataInvalidException {
+        ProyectoHabilidadService proyectoHabilidadService = new ProyectoHabilidadService();
+        proyectoHabilidadService.insertProyectoHabilidad(proyectoHabilidadRequest, rol, usuarioId, proyectoId);
+    }
+
+    public boolean ValidProyectoUsuario(int usuarioId, int proyectoId, Connection connection) throws SQLException {
+        ProyectoDAO proyectoDAO = new ProyectoDAO();
+        return proyectoDAO.existsProyecto(proyectoId, usuarioId, connection);
+    }
+
+    public boolean ValidProyectoUsuario(int usuarioId, int proyectoId) throws SQLException {
+        ProyectoDAO proyectoDAO = new ProyectoDAO();
+        return proyectoDAO.existsProyecto(proyectoId, usuarioId);
     }
 }
