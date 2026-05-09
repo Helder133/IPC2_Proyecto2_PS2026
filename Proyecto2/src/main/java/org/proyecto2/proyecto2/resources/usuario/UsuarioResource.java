@@ -136,7 +136,7 @@ public class UsuarioResource {
 
     @POST
     @Secured
-    @Path("/freelacner/habilidad")
+    @Path("/freelancer/habilidad")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response agregarHabilidad(@Context ContainerRequestContext request, FreelancerHabilidadRequest freelancerHabilidadRequest) {

@@ -47,7 +47,7 @@ public class ProyectoService {
         Proyecto proyecto = new Proyecto(proyectoUpdate);
         if (!proyecto.isValidUpdate()) throw new UserDataInvalidException("Los datos del proyecto no son válidos.");
         ProyectoDAO proyectoDAO = new ProyectoDAO();
-        if (!proyectoDAO.existsProyecto(proyecto.getProyectoId(), usuarioId))
+        if (!proyectoDAO.existsProyectoUsuario(proyecto.getProyectoId(), usuarioId))
             throw new UserDataInvalidException("El proyecto no existe o no pertenece al usuario.");
         proyectoDAO.update(proyecto);
     }
@@ -56,9 +56,27 @@ public class ProyectoService {
         if (!EnumUsuario.Cliente.equals(rol))
             throw new UserDataInvalidException("El usuario no tiene permisos para actualizar el estado de un proyecto.");
         ProyectoDAO proyectoDAO = new ProyectoDAO();
-        if (!proyectoDAO.existsProyecto(proyectoId, usuarioId))
+        if (!proyectoDAO.existsProyectoUsuario(proyectoId, usuarioId))
             throw new UserDataInvalidException("El proyecto no existe o no pertenece al usuario.");
         proyectoDAO.updateEstado(estado, proyectoId);
+    }
+
+    public void updateProyectoEstadoCancelacion(int proyectoId, int usuarioId, EnumUsuario rol) throws SQLException, UserDataInvalidException {
+        if (!EnumUsuario.Cliente.equals(rol))
+            throw new UserDataInvalidException("El usuario no tiene permisos para actualizar el estado de un proyecto.");
+        ProyectoDAO proyectoDAO = new ProyectoDAO();
+        if (!proyectoDAO.existsProyectoUsuario(proyectoId, usuarioId))
+            throw new UserDataInvalidException("El proyecto no existe o no pertenece al usuario.");
+        proyectoDAO.updateEstadoCancelado(proyectoId);
+    }
+
+    public void updateProyectoEstadoEnRevision(int proyectoId, int usuarioId, EnumUsuario rol) throws SQLException, UserDataInvalidException {
+        if (!EnumUsuario.Cliente.equals(rol))
+            throw new UserDataInvalidException("El usuario no tiene permisos para actualizar el estado de un proyecto.");
+        ProyectoDAO proyectoDAO = new ProyectoDAO();
+        if (!proyectoDAO.existsProyectoUsuario(proyectoId, usuarioId))
+            throw new UserDataInvalidException("El proyecto no existe o no pertenece al usuario.");
+        proyectoDAO.updateEstado(EnumProyecto.EN_REVISION,proyectoId);
     }
 
     private List<Habilidad> extraerHabilidades(int proyectoId) throws SQLException, UserDataInvalidException {
@@ -131,8 +149,30 @@ public class ProyectoService {
         return proyectos;
     }
 
+    public List<Proyecto> getAllProyectoByHabilidad(int habilidadId, EnumUsuario rol) throws SQLException, UserDataInvalidException {
+        if (EnumUsuario.Administrador.equals(rol))
+            throw new UserDataInvalidException("El usuario no tiene permisos para obtener los proyectos por habilidad.");
+        ProyectoDAO proyectoDAO = new ProyectoDAO();
+        List<Proyecto> proyectos = proyectoDAO.getAllProyectoByHabilidad(habilidadId);
+        for (Proyecto proyecto : proyectos) {
+            proyecto.setHabilidades(extraerHabilidades(proyecto.getProyectoId()));
+        }
+        return proyectos;
+    }
+
+    public List<Proyecto> getAllProyectoInAbiertoEstado(EnumUsuario rol) throws SQLException, UserDataInvalidException {
+        if (!EnumUsuario.Freelancer.equals(rol))
+            throw new UserDataInvalidException("El usuario no tiene permisos para obtener los proyectos en estado abierto.");
+        ProyectoDAO proyectoDAO = new ProyectoDAO();
+        List<Proyecto> proyectos = proyectoDAO.getAllProyectoInAbiertoEstado();
+        for (Proyecto proyecto : proyectos) {
+            proyecto.setHabilidades(extraerHabilidades(proyecto.getProyectoId()));
+        }
+        return proyectos;
+    }
+
     public void deleteProyectoUsuario(int usuarioId, int proyectoId, int habilidadId, EnumUsuario rol) throws SQLException, UserDataInvalidException {
-        ProyectoHabilidadService  proyectoHabilidadService = new ProyectoHabilidadService();
+        ProyectoHabilidadService proyectoHabilidadService = new ProyectoHabilidadService();
         proyectoHabilidadService.delete(habilidadId, rol, usuarioId, proyectoId);
     }
 
@@ -143,11 +183,11 @@ public class ProyectoService {
 
     public boolean ValidProyectoUsuario(int usuarioId, int proyectoId, Connection connection) throws SQLException {
         ProyectoDAO proyectoDAO = new ProyectoDAO();
-        return proyectoDAO.existsProyecto(proyectoId, usuarioId, connection);
+        return proyectoDAO.existsProyectoUsuario(proyectoId, usuarioId, connection);
     }
 
     public boolean ValidProyectoUsuario(int usuarioId, int proyectoId) throws SQLException {
         ProyectoDAO proyectoDAO = new ProyectoDAO();
-        return proyectoDAO.existsProyecto(proyectoId, usuarioId);
+        return proyectoDAO.existsProyectoUsuario(proyectoId, usuarioId);
     }
 }

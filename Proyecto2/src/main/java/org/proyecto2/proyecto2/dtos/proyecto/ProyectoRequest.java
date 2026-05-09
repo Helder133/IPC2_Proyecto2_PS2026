@@ -3,7 +3,6 @@ package org.proyecto2.proyecto2.dtos.proyecto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import org.proyecto2.proyecto2.models.proyecto.EnumProyecto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,7 +13,6 @@ public class ProyectoRequest {
     protected String titulo;
     protected String descripcion;
     protected double presupuesto;
-    protected EnumProyecto estado;
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     protected LocalDate fechaCreacion;
@@ -61,14 +59,6 @@ public class ProyectoRequest {
 
     public void setPresupuesto(double presupuesto) {
         this.presupuesto = presupuesto;
-    }
-
-    public EnumProyecto getEstado() {
-        return estado;
-    }
-
-    public void setEstado(EnumProyecto estado) {
-        this.estado = estado;
     }
 
     public LocalDate getFechaCreacion() {

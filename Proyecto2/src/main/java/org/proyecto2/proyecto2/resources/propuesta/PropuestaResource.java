@@ -8,9 +8,8 @@ import jakarta.ws.rs.core.Response;
 import org.proyecto2.proyecto2.dtos.propuesta.PropuestaDetalleResponse;
 import org.proyecto2.proyecto2.dtos.propuesta.PropuestaRequest;
 import org.proyecto2.proyecto2.dtos.propuesta.PropuestaResponse;
-import org.proyecto2.proyecto2.exceptions.EntityAlreadyExistsException;
+import org.proyecto2.proyecto2.dtos.propuesta.PropuestaUpdate;
 import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
-import org.proyecto2.proyecto2.models.propuesta.Propuesta;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
 import org.proyecto2.proyecto2.security.Secured;
 import org.proyecto2.proyecto2.services.propuesta.PropuestaService;
@@ -79,9 +78,10 @@ public class PropuestaResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllPropuestaForAProyecto(@PathParam("proyectoId") int proyectoId, @Context ContainerRequestContext request) {
         try {
+            int usuarioId = (int) request.getProperty("usuarioId");
             String rol = (String) request.getProperty("rol");
             PropuestaService propuestaService = new PropuestaService();
-            List<PropuestaDetalleResponse> propuestaResponses = propuestaService.getAllPropuestaForAProyecto(proyectoId, EnumUsuario.valueOf(rol))
+            List<PropuestaDetalleResponse> propuestaResponses = propuestaService.getAllPropuestaForAProyecto(proyectoId, usuarioId, EnumUsuario.valueOf(rol))
                     .stream()
                     .map(PropuestaDetalleResponse::new)
                     .toList();
@@ -89,6 +89,25 @@ public class PropuestaResource {
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
         } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @PUT
+    @Path("/actualizar")
+    @Secured
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response actualizarPropuesta(PropuestaUpdate propuestaUpdate, @Context ContainerRequestContext request) {
+        try {
+            int usuarioId = (int) request.getProperty("usuarioId");
+            String rol = (String) request.getProperty("rol");
+            PropuestaService propuestaService = new PropuestaService();
+            propuestaService.updatePropuesta(propuestaUpdate, usuarioId, EnumUsuario.valueOf(rol));
+            return Response.ok("{\"message\": \"Propuesta actualizada exitosamente\"}").build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        }  catch (SQLException e) {
             return errorEjecucion(e.getMessage(), 3);
         }
     }

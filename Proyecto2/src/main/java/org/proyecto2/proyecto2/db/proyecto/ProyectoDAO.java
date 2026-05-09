@@ -15,18 +15,21 @@ public class ProyectoDAO implements CRUD<Proyecto> {
     private static final String INSERT_PROYECTO = "INSERT INTO proyecto(usuario_id, categoria_id, titulo, descripcion, presupuesto, estado, fecha_creacion, fecha_limite) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String UPDATE_PROYECTO = "UPDATE proyecto SET categoria_id = ?, titulo = ?, descripcion = ?, presupuesto = ?, fecha_limite = ? WHERE proyecto_id = ?";
     private static final String UPDATE_PROYECTO_ESTADO = "UPDATE proyecto SET estado = ? WHERE proyecto_id = ?";
+    private static final String UPDATE_PROYECTO_ESTADO_CANCELADO = "UPDATE proyecto SET estado = 'CANCELADO' WHERE proyecto_id = ?";
     private static final String GET_ALL_USUARIO_PROYECTO = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.usuario_id = ?";
     private static final String GET_ALL_USUARIO_PROYECTO_BY_COINCIDENCE = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.titulo like ? AND p.usuario_id = ?";
     private static final String GET_USUARIO_PROYECTO_BY_ID = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.proyecto_id = ? AND p.usuario_id = ?";
     private static final String GET_ALL_PROYECTO = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id";
     private static final String GET_PROYECTO_BY_ID = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.proyecto_id = ?";
-    private static final String VALID_PROYECTO = "SELECT 1 FROM proyecto WHERE proyecto_id = ? AND usuario_id = ?";
+    private static final String VALID_PROYECTO_USUARIO = "SELECT 1 FROM proyecto WHERE proyecto_id = ? AND usuario_id = ?";
     private static final String GET_ALL_PROYECTO_BY_CATEGORIA = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.categoria_id = ?";
     private static final String GET_ALL_PROYECTO_BY_PRESUPUESTO = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.presupuesto BETWEEN ? AND ?";
+    private static final String GET_ALL_PROYECTO_BY_HABILIDAD = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id JOIN proyecto_habilidad ph ON p.proyecto_id = ph.proyecto_id WHERE ph.habilidad_id = ?";
+    private static final String GET_ALL_PROYECTO_IN_ABIERTO_ESTADO = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.estado = 'ABIERTO'";
 
-    public boolean existsProyecto(int proyectoId, int usuarioId) throws SQLException {
+    public boolean existsProyectoUsuario(int proyectoId, int usuarioId) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
-        try (PreparedStatement select = connection.prepareStatement(VALID_PROYECTO)) {
+        try (PreparedStatement select = connection.prepareStatement(VALID_PROYECTO_USUARIO)) {
             select.setInt(1, proyectoId);
             select.setInt(2, usuarioId);
             try (ResultSet rs = select.executeQuery()) {
@@ -35,8 +38,8 @@ public class ProyectoDAO implements CRUD<Proyecto> {
         }
     }
 
-    public boolean existsProyecto(int proyectoId, int usuarioId, Connection connection) throws SQLException {
-        try (PreparedStatement select = connection.prepareStatement(VALID_PROYECTO)) {
+    public boolean existsProyectoUsuario(int proyectoId, int usuarioId, Connection connection) throws SQLException {
+        try (PreparedStatement select = connection.prepareStatement(VALID_PROYECTO_USUARIO)) {
             select.setInt(1, proyectoId);
             select.setInt(2, usuarioId);
             try (ResultSet rs = select.executeQuery()) {
@@ -99,6 +102,14 @@ public class ProyectoDAO implements CRUD<Proyecto> {
         try (PreparedStatement update = connection.prepareStatement(UPDATE_PROYECTO_ESTADO)) {
             update.setString(1, estado.name());
             update.setInt(2, proyectoId);
+            update.executeUpdate();
+        }
+    }
+
+    public void updateEstadoCancelado(int proyectoId) throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        try (PreparedStatement update = connection.prepareStatement(UPDATE_PROYECTO_ESTADO_CANCELADO)) {
+            update.setInt(1, proyectoId);
             update.executeUpdate();
         }
     }
@@ -193,6 +204,28 @@ public class ProyectoDAO implements CRUD<Proyecto> {
                 return proyectos;
             }
 
+        }
+    }
+
+    public List<Proyecto> getAllProyectoByHabilidad(int habilidadId) throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        List<Proyecto> proyectos = new ArrayList<>();
+        try (PreparedStatement select = connection.prepareStatement(GET_ALL_PROYECTO_BY_HABILIDAD)) {
+            select.setInt(1, habilidadId);
+            try (ResultSet rs = select.executeQuery()) {
+                while (rs.next()) proyectos.add(extraerDatos(rs));
+                return proyectos;
+            }
+        }
+    }
+
+    public List<Proyecto> getAllProyectoInAbiertoEstado() throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        List<Proyecto> proyectos = new ArrayList<>();
+        try (PreparedStatement select = connection.prepareStatement(GET_ALL_PROYECTO_IN_ABIERTO_ESTADO);
+             ResultSet rs = select.executeQuery()) {
+            while (rs.next()) proyectos.add(extraerDatos(rs));
+            return proyectos;
         }
     }
 

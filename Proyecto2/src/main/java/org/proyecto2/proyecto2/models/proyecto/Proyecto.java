@@ -41,7 +41,6 @@ public class Proyecto {
         this.titulo = proyectoRequest.getTitulo();
         this.descripcion = proyectoRequest.getDescripcion();
         this.presupuesto = proyectoRequest.getPresupuesto();
-        this.estado = proyectoRequest.getEstado();
         this.fechaCreacion = proyectoRequest.getFechaCreacion();
         this.fechaLimite = proyectoRequest.getFechaLimite();
         this.estado = EnumProyecto.ABIERTO;

@@ -12,11 +12,11 @@ import java.util.Optional;
 
 public class PropuestaDAO implements CRUD<Propuesta> {
     private static final String INSERT_PROPUESTA = "INSERT INTO propuesta(proyecto_id, usuario_id, monto, tiempo_entrega, descripcion, fecha_creacion, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    private static final String UPDATE_PROPUESTA = "UPDATE propuesta SET monto = ?, tiempo_entega = ?, descripcion = ? WHERE propuesta_id = ?";
+    private static final String UPDATE_PROPUESTA = "UPDATE propuesta SET monto = ?, tiempo_entrega = ?, descripcion = ? WHERE propuesta_id = ?";
     private static final String UPDATE_PROPUESTA_ESTADO = "UPDATE propuesta SET estado = ? WHERE propuesta_id = ?";
     private static final String EXISTS_PROPUESTA = "SELECT 1 FROM propuesta WHERE propuesta_id = ? AND usuario_id = ?";
     private static final String GET_BY_ID_PROPUESTA = "SELECT * FROM propuesta WHERE propuesta_id = ?";
-    private static final String GET_ALL_PROPUESTA_FOR_A_PROYECTO = "SELECT p.propuesta_id, p.proyecto_id, p.monto, p.tiempo_entrega, p.descripcion, p.estado, p.fecha_creacion, u.usuario_id, u.nombre_completo, u.user_name, COALESCE(cal.promedio_calificacion, 0) AS promedio_calificacion, COALESCE(cal.total_calificaciones, 0) AS total_calificaciones FROM propuesta p INNER JOIN usuario u ON p.usuario_id = u.usuario_id LEFT JOIN (SELECT p2.usuario_id, COUNT(c.calificacion) AS total_calificaciones, AVG(c.calificacion) AS promedio_calificacion FROM propuesta p2 INNER JOIN contrato c ON p2.propuesta_id = c.propuesta_id GROUP BY p2.usuario_id) cal ON p.usuario_id = cal.usuario_id WHERE p.proyecto_id = ?";
+    private static final String GET_ALL_PROPUESTA_FOR_A_PROYECTO = "SELECT p.propuesta_id, p.proyecto_id, p.monto, p.tiempo_entrega, p.descripcion, p.estado, p.fecha_creacion, u.usuario_id, u.nombre_completo, u.user_name, COALESCE(cal.promedio_calificacion, 0) AS promedio_calificacion, COALESCE(cal.total_calificaciones, 0) AS total_calificaciones FROM propuesta p INNER JOIN usuario u ON p.usuario_id = u.usuario_id LEFT JOIN (SELECT p2.usuario_id, COUNT(c.calificacion) AS total_calificaciones, AVG(c.calificacion) AS promedio_calificacion FROM propuesta p2 INNER JOIN contrato c ON p2.propuesta_id = c.propuesta_id GROUP BY p2.usuario_id) cal ON p.usuario_id = cal.usuario_id JOIN proyecto p3 on p.proyecto_id = p3.proyecto_id WHERE p.proyecto_id = ? AND p3.usuario_id = ?;";
     private static final String GET_ALL_PROPUESTA_FROM_A_FREELANCER = "SELECT * FROM propuesta WHERE usuario_id = ? AND proyecto_id = ?";
 
     public boolean existsPropuesta(int propuestaId, int usuarioId) throws SQLException {
@@ -97,10 +97,11 @@ public class PropuestaDAO implements CRUD<Propuesta> {
         }
     }
 
-    public List<PropuestaDetalle> getAllPropuestaForAProyecto(int proyectoId) throws SQLException {
+    public List<PropuestaDetalle> getAllPropuestaForAProyecto(int proyectoId, int usuarioId) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
         try (PreparedStatement select = connection.prepareStatement(GET_ALL_PROPUESTA_FOR_A_PROYECTO)) {
             select.setInt(1, proyectoId);
+            select.setInt(2, usuarioId);
             try (ResultSet rs = select.executeQuery()) {
                 List<PropuestaDetalle> propuestas = new java.util.ArrayList<>();
                 while (rs.next()) {

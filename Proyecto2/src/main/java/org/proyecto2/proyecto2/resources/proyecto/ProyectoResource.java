@@ -31,7 +31,7 @@ public class ProyectoResource {
             String rol = (String) request.getProperty("rol");
             int usuarioId = (int) request.getProperty("usuarioId");
             ProyectoService proyectoService = new ProyectoService();
-            proyectoService.createProyecto(proyectoRequest, EnumUsuario.valueOf(rol),  usuarioId);
+            proyectoService.createProyecto(proyectoRequest, EnumUsuario.valueOf(rol), usuarioId);
             return Response.status(Response.Status.CREATED)
                     .entity("{\"message\": \"Proyecto creada exitosamente\"}")
                     .type(MediaType.APPLICATION_JSON)
@@ -64,11 +64,13 @@ public class ProyectoResource {
 
     // EndPoint del freelancer
     @GET
+    @Secured
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllProyectos() {
+    public Response getAllProyectos(@Context ContainerRequestContext request) {
         try {
+            String rol = (String) request.getProperty("rol");
             ProyectoService proyectoService = new ProyectoService();
-            List<ProyectoResponse> proyectoResponses = proyectoService.getAll()
+            List<ProyectoResponse> proyectoResponses = proyectoService.getAllProyectoInAbiertoEstado(EnumUsuario.valueOf(rol))
                     .stream()
                     .map(ProyectoResponse::new)
                     .toList();
@@ -106,7 +108,7 @@ public class ProyectoResource {
                     .map(ProyectoResponse::new)
                     .toList();
             return Response.ok(proyectoResponses).build();
-        }  catch (UserDataInvalidException e) {
+        } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
         } catch (SQLException e) {
             return errorEjecucion(e.getMessage(), 3);
@@ -172,7 +174,7 @@ public class ProyectoResource {
     @Secured
     @Path("/categoria/{categoriaId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProyectoByCategoria(@PathParam("categoriaId") int categoriaId,  @Context ContainerRequestContext request) {
+    public Response getProyectoByCategoria(@PathParam("categoriaId") int categoriaId, @Context ContainerRequestContext request) {
         try {
             String rol = (String) request.getProperty("rol");
             ProyectoService proyectoService = new ProyectoService();
@@ -181,7 +183,27 @@ public class ProyectoResource {
                     .map(ProyectoResponse::new)
                     .toList();
             return Response.ok(proyectoResponses).build();
-        }  catch (UserDataInvalidException e) {
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @GET
+    @Secured
+    @Path("/habilidad/{habilidadId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getProyectoByHabilidad(@PathParam("habilidadId") int habilidadId, @Context ContainerRequestContext request) {
+        try {
+            String rol = (String) request.getProperty("rol");
+            ProyectoService proyectoService = new ProyectoService();
+            List<ProyectoResponse> proyectoResponses = proyectoService.getAllProyectoByHabilidad(habilidadId, EnumUsuario.valueOf(rol))
+                    .stream()
+                    .map(ProyectoResponse::new)
+                    .toList();
+            return Response.ok(proyectoResponses).build();
+        } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
         } catch (SQLException e) {
             return errorEjecucion(e.getMessage(), 3);
@@ -207,11 +229,47 @@ public class ProyectoResource {
         }
     }
 
+    @PUT
+    @Secured
+    @Path("/actualizar/cancelar/{proyectoId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response actualizarProyectoACancelado(@PathParam("proyectoId") int proyectoId, @Context ContainerRequestContext request) {
+        try {
+            int usuarioId = (int) request.getProperty("usuarioId");
+            String rol = (String) request.getProperty("rol");
+            ProyectoService proyectoService = new ProyectoService();
+            proyectoService.updateProyectoEstadoCancelacion(proyectoId, usuarioId, EnumUsuario.valueOf(rol));
+            return Response.ok("{\"message\": \"Proyecto cancelado exitosamente\"}").build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    //Cuando el cliente ingresa el listado de las propuestas de un proyecto, el proyecto pasa ha estado en revisión
+    @PUT
+    @Secured
+    @Path("/actualizar/en-reserva/{proyectoId}")
+    public Response actualizarProyectoEnReserva(@PathParam("proyectoId") int proyectoId, @Context ContainerRequestContext request) {
+        try {
+            int usuarioId = (int) request.getProperty("usuarioId");
+            String rol = (String) request.getProperty("rol");
+            ProyectoService proyectoService = new ProyectoService();
+            proyectoService.updateProyectoEstadoEnRevision(proyectoId, usuarioId, EnumUsuario.valueOf(rol));
+            return Response.ok().build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
     @DELETE
     @Secured
     @Path("/eliminar/{proyectoId}/habilidad/{habilidadId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response eliminarProyecto( @PathParam("proyectoId") int proyectoId, @PathParam("habilidadId") int habilidadId, @Context ContainerRequestContext request) {
+    public Response eliminarProyecto(@PathParam("proyectoId") int proyectoId, @PathParam("habilidadId") int habilidadId, @Context ContainerRequestContext request) {
         try {
             int usuarioId = (int) request.getProperty("usuarioId");
             String rol = (String) request.getProperty("rol");

@@ -79,14 +79,15 @@ CREATE TABLE IF NOT EXISTS freelancer_habilidad (
 	CONSTRAINT fk_habilidad FOREIGN KEY (habilidad_id) REFERENCES habilidad (habilidad_id)
 );
 
-SELECT * FROM usuario;
-SELECT * FROM freelancer;
 SELECT * FROM cliente;
 SELECT * FROM categoria;
+SELECT * FROM usuario;
 SELECT * FROM proyecto;
+SELECT * FROM freelancer;
 SELECT * FROM habilidad;
 SELECT * FROM proyecto_habilidad;
 SELECT * FROM freelancer_habilidad;
+
 SELECT h.* FROM freelancer_habilidad fh JOIN habilidad h ON fh.habilidad_id = h.habilidad_id WHERE fh.usuario_id = 3;
 
 CREATE TABLE IF NOT EXISTS categoria (
@@ -122,6 +123,11 @@ SELECT p.*, c.nombre, c.descripcion, c.estado FROM proyecto p JOIN categoria c O
 SELECT h.* FROM proyecto_habilidad ph JOIN habilidad h ON ph.habilidad_id = h.habilidad_id WHERE ph.proyecto_id = 1; 
 SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE proyecto_id = 12 AND usuario_id = 5
 
+SELECT h.* FROM proyecto_habilidad ph JOIN habilidad h ON ph.habilidad_id = h.habilidad_id WHERE ph.proyecto_id = ?;
+SELECT p.* FROM proyecto_habilidad ph JOIN proyecto p ON ph.proyecto_id = p.proyecto_id WHERE ph.habilidad_id = 2;
+SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id JOIN proyecto_habilidad ph ON p.proyecto_id = ph.proyecto_id WHERE ph.habilidad_id = 2;
+SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.estado = 'ABIERTO';
+
 CREATE TABLE IF NOT EXISTS propuesta (
 	propuesta_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	proyecto_id INT NOT NULL,
@@ -135,15 +141,21 @@ CREATE TABLE IF NOT EXISTS propuesta (
 	CONSTRAINT fk_freelancer2 FOREIGN KEY (usuario_id) REFERENCES freelancer (usuario_id)
 );
 
-SELECT u.*, f.*, p.* FROM propuesta p JOIN usuario u ON p.usuario_id = u.usuario_id JOIN freelancer f ON u.usuario_id = f.usuario_id;
+SELECT * FROM propuesta;
 
 CREATE TABLE IF NOT EXISTS contrato (
 	contrato_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-	propuesta_id INT NOT NULL,
+	propuesta_id INT NOT NULL UNIQUE,
+	estado ENUM('ACTIVO', 'FINALIZADO', 'CANCELADO') NOT NULL DEFAULT 'ACTIVO',
+	motivo_cancelacion VARCHAR(250),
+	fecha_creacion DATE NOT NULL,
+	fecha_finalizacion DATE,
 	comentario VARCHAR(200),
 	calificacion INT CHECK (calificacion >= 1 AND calificacion <= 5),
 	CONSTRAINT fk_propuesta FOREIGN KEY (propuesta_id) REFERENCES propuesta (propuesta_id)
 );
+
+SELECT c.* FROM contrato c JOIN propuesta p on c.propuesta_id = p.propuesta_id WHERE p.usuario_id = 1;
 
 CREATE TABLE IF NOT EXISTS entrega (
 	entrega_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -193,7 +205,7 @@ CREATE TABLE IF NOT EXISTS configuracion_sistema (
 );
 
 
-SELECT p.propuesta_id, p.proyecto_id, p.monto, p.tiempo_entrega, p.descripcion, p.estado, p.fecha_creacion, u.usuario_id, u.nombre_completo, u.user_name, COALESCE(cal.promedio_calificacion, 0) AS promedio_calificacion, COALESCE(cal.total_calificaciones, 0) AS total_calificaciones FROM propuesta p INNER JOIN usuario u ON p.usuario_id = u.usuario_id LEFT JOIN (SELECT p2.usuario_id, COUNT(c.calificacion) AS total_calificaciones, AVG(c.calificacion) AS promedio_calificacion FROM propuesta p2 INNER JOIN contrato c ON p2.propuesta_id = c.propuesta_id GROUP BY p2.usuario_id) cal ON p.usuario_id = cal.usuario_id WHERE p.proyecto_id = 1;
+SELECT p.propuesta_id, p.proyecto_id, p.monto, p.tiempo_entrega, p.descripcion, p.estado, p.fecha_creacion, u.usuario_id, u.nombre_completo, u.user_name, COALESCE(cal.promedio_calificacion, 0) AS promedio_calificacion, COALESCE(cal.total_calificaciones, 0) AS total_calificaciones FROM propuesta p INNER JOIN usuario u ON p.usuario_id = u.usuario_id LEFT JOIN (SELECT p2.usuario_id, COUNT(c.calificacion) AS total_calificaciones, AVG(c.calificacion) AS promedio_calificacion FROM propuesta p2 INNER JOIN contrato c ON p2.propuesta_id = c.propuesta_id GROUP BY p2.usuario_id) cal ON p.usuario_id = cal.usuario_id JOIN proyecto p3 on p.proyecto_id = p3.proyecto_id WHERE p.proyecto_id = ? AND p3.usuario_id = ?;
 
 
 

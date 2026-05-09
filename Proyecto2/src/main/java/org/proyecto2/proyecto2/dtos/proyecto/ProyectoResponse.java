@@ -2,6 +2,7 @@ package org.proyecto2.proyecto2.dtos.proyecto;
 
 import org.proyecto2.proyecto2.dtos.categoria.CategoriaResponse;
 import org.proyecto2.proyecto2.dtos.habilidad.HabilidadResponse;
+import org.proyecto2.proyecto2.models.proyecto.EnumProyecto;
 import org.proyecto2.proyecto2.models.proyecto.Proyecto;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ public class ProyectoResponse extends ProyectoRequest {
     private int proyectoId;
     private List<HabilidadResponse> habilidadResponses;
     private CategoriaResponse categoria;
+    private EnumProyecto estado;
 
     public ProyectoResponse(Proyecto proyecto) {
         this.proyectoId = proyecto.getProyectoId();
@@ -48,5 +50,13 @@ public class ProyectoResponse extends ProyectoRequest {
 
     public void setCategoria(CategoriaResponse categoria) {
         this.categoria = categoria;
+    }
+
+    public EnumProyecto getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EnumProyecto estado) {
+        this.estado = estado;
     }
 }
