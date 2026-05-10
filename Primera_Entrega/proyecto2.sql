@@ -48,6 +48,11 @@ CREATE TABLE IF NOT EXISTS freelancer (
 	CONSTRAINT fk_freelancer FOREIGN KEY (usuario_id) REFERENCES usuario (usuario_id)
 );
 
+SELECT * FROM cartera where usuario_id = 5;
+SELECT * FROM transaccion where usuario_id = 5;
+
+INSERT INTO cartera (usuario_id, saldo, saldo_bloqueado) VALUES (2,1565.75,434.25);
+
 CREATE TABLE IF NOT EXISTS cartera (
 	usuario_id INT PRIMARY KEY NOT NULL,
 	saldo DECIMAL(10,2) NOT NULL DEFAULT 0.0,
@@ -79,11 +84,11 @@ CREATE TABLE IF NOT EXISTS freelancer_habilidad (
 	CONSTRAINT fk_habilidad FOREIGN KEY (habilidad_id) REFERENCES habilidad (habilidad_id)
 );
 
-SELECT * FROM cliente;
-SELECT * FROM categoria;
 SELECT * FROM usuario;
-SELECT * FROM proyecto;
+SELECT * FROM cliente;
 SELECT * FROM freelancer;
+SELECT * FROM categoria;
+
 SELECT * FROM habilidad;
 SELECT * FROM proyecto_habilidad;
 SELECT * FROM freelancer_habilidad;
@@ -135,13 +140,17 @@ CREATE TABLE IF NOT EXISTS propuesta (
 	monto DECIMAL(10,2) NOT NULL,
 	tiempo_entrega INT NOT NULL,
 	descripcion VARCHAR(200) NOT NULL,
-	estado ENUM('PENDIENTE','ACEPTADA','RECHAZADA') NOT NULL DEFAULT 'PENDIENTE',
+	estado ENUM('PENDIENTE','ACEPTADA','RECHAZADA', 'RETIRADO') NOT NULL DEFAULT 'PENDIENTE',
 	fecha_creacion DATE NOT NULL,
 	CONSTRAINT fk_proyecto2 FOREIGN KEY (proyecto_id) REFERENCES proyecto (proyecto_id),
 	CONSTRAINT fk_freelancer2 FOREIGN KEY (usuario_id) REFERENCES freelancer (usuario_id)
 );
 
-SELECT * FROM propuesta;
+SELECT 1 FROM propuesta WHERE propuesta_id = 2 AND usuario_id = 3 ;
+
+
+
+SELECT pr.proyecto_id  FROM propuesta p JOIN proyecto pr ON p.proyecto_id = pr.proyecto_id WHERE p.propuesta_id = 3 AND pr.usuario_id = 2; 
 
 CREATE TABLE IF NOT EXISTS contrato (
 	contrato_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
@@ -154,8 +163,12 @@ CREATE TABLE IF NOT EXISTS contrato (
 	calificacion INT CHECK (calificacion >= 1 AND calificacion <= 5),
 	CONSTRAINT fk_propuesta FOREIGN KEY (propuesta_id) REFERENCES propuesta (propuesta_id)
 );
-
-SELECT c.* FROM contrato c JOIN propuesta p on c.propuesta_id = p.propuesta_id WHERE p.usuario_id = 1;
+SELECT * FROM proyecto;
+SELECT * FROM propuesta;
+SELECT * FROM contrato;
+SELECT c.* FROM contrato c JOIN propuesta p on c.propuesta_id = p.propuesta_id JOIN proyecto p2 ON p.proyecto_id = p2.proyecto_id WHERE p2.usuario_id = 2;
+SELECT pr.proyecto_id  FROM contrato c JOIN propuesta p on c.propuesta_id = p.propuesta_id JOIN proyecto pr on p.proyecto_id = pr.proyecto_id WHERE pr.usuario_id = 2 AND c.contrato_id = 3;
+SELECT pr.proyecto_id FROM contrato c JOIN propuesta p ON c.propuesta_id = p.propuesta_id JOIN proyecto pr ON p.proyecto_id = pr.proyecto_id WHERE c.contrato_id = 3;
 
 CREATE TABLE IF NOT EXISTS entrega (
 	entrega_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -167,6 +180,8 @@ CREATE TABLE IF NOT EXISTS entrega (
 	fecha DATE NOT NULL,
 	CONSTRAINT fk_contrato FOREIGN KEY (contrato_id) REFERENCES contrato (contrato_id)
 );
+
+SELECT pr.proyecto_id FROM entrega e JOIN contrato c ON e.contrato_id = c.contrato_id JOIN propuesta p ON c.propuesta_id = p.propuesta_id JOIN proyecto pr ON p.proyecto_id = pr.proyecto_id WHERE e.contrato_id = 1;
 
 CREATE TABLE IF NOT EXISTS cartera_plataforma (
 	plataforma_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,

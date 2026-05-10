@@ -14,7 +14,8 @@ public class PropuestaDAO implements CRUD<Propuesta> {
     private static final String INSERT_PROPUESTA = "INSERT INTO propuesta(proyecto_id, usuario_id, monto, tiempo_entrega, descripcion, fecha_creacion, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String UPDATE_PROPUESTA = "UPDATE propuesta SET monto = ?, tiempo_entrega = ?, descripcion = ? WHERE propuesta_id = ?";
     private static final String UPDATE_PROPUESTA_ESTADO = "UPDATE propuesta SET estado = ? WHERE propuesta_id = ?";
-    private static final String EXISTS_PROPUESTA = "SELECT 1 FROM propuesta WHERE propuesta_id = ? AND usuario_id = ?";
+    private static final String EXISTS_PROPUESTA = "SELECT 1 FROM propuesta WHERE propuesta_id = ? AND usuario_id = ? AND estado <> 'RETIRADO'";
+    private static final String EXISTS_PROPUESTA_FREELANCER = "SELECT 1 FROM propuesta WHERE proyecto_id = ? AND usuario_id = ? AND estado <> 'RETIRADO'";
     private static final String GET_BY_ID_PROPUESTA = "SELECT * FROM propuesta WHERE propuesta_id = ?";
     private static final String GET_ALL_PROPUESTA_FOR_A_PROYECTO = "SELECT p.propuesta_id, p.proyecto_id, p.monto, p.tiempo_entrega, p.descripcion, p.estado, p.fecha_creacion, u.usuario_id, u.nombre_completo, u.user_name, COALESCE(cal.promedio_calificacion, 0) AS promedio_calificacion, COALESCE(cal.total_calificaciones, 0) AS total_calificaciones FROM propuesta p INNER JOIN usuario u ON p.usuario_id = u.usuario_id LEFT JOIN (SELECT p2.usuario_id, COUNT(c.calificacion) AS total_calificaciones, AVG(c.calificacion) AS promedio_calificacion FROM propuesta p2 INNER JOIN contrato c ON p2.propuesta_id = c.propuesta_id GROUP BY p2.usuario_id) cal ON p.usuario_id = cal.usuario_id JOIN proyecto p3 on p.proyecto_id = p3.proyecto_id WHERE p.proyecto_id = ? AND p3.usuario_id = ?;";
     private static final String GET_ALL_PROPUESTA_FROM_A_FREELANCER = "SELECT * FROM propuesta WHERE usuario_id = ? AND proyecto_id = ?";
@@ -23,6 +24,17 @@ public class PropuestaDAO implements CRUD<Propuesta> {
         Connection connection = DBConnection.getInstance().getConnection();
         try (PreparedStatement select = connection.prepareStatement(EXISTS_PROPUESTA)) {
             select.setInt(1, propuestaId);
+            select.setInt(2, usuarioId);
+            try (ResultSet rs = select.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    public boolean existsPropuestaFreelancer(int proyectoId, int usuarioId) throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        try (PreparedStatement select = connection.prepareStatement(EXISTS_PROPUESTA_FREELANCER)) {
+            select.setInt(1, proyectoId);
             select.setInt(2, usuarioId);
             try (ResultSet rs = select.executeQuery()) {
                 return rs.next();
@@ -66,6 +78,15 @@ public class PropuestaDAO implements CRUD<Propuesta> {
         }
     }
 
+    public void updateEstado(EnumPropuesta estado, int propuestaId) throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        try (PreparedStatement update = connection.prepareStatement(UPDATE_PROPUESTA_ESTADO)) {
+            update.setString(1, estado.name());
+            update.setInt(2, propuestaId);
+            update.executeUpdate();
+        }
+    }
+
     @Override
     public void delete(int id) throws SQLException {
 
@@ -74,6 +95,16 @@ public class PropuestaDAO implements CRUD<Propuesta> {
     @Override
     public Optional<Propuesta> getById(int id) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
+        try (PreparedStatement select = connection.prepareStatement(GET_BY_ID_PROPUESTA)) {
+            select.setInt(1, id);
+            try (ResultSet rs = select.executeQuery()) {
+                if (rs.next()) return Optional.of(extraerDatos(rs));
+                return Optional.empty();
+            }
+        }
+    }
+
+    public Optional<Propuesta> getById(int id, Connection connection) throws SQLException {
         try (PreparedStatement select = connection.prepareStatement(GET_BY_ID_PROPUESTA)) {
             select.setInt(1, id);
             try (ResultSet rs = select.executeQuery()) {

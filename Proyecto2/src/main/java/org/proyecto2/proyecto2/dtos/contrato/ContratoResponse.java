@@ -16,6 +16,8 @@ public class ContratoResponse {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate fechaCreacion;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate fechaFinalizacion;
     private String comentario;
     private int calificacion;

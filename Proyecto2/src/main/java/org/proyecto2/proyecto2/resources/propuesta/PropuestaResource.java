@@ -9,6 +9,7 @@ import org.proyecto2.proyecto2.dtos.propuesta.PropuestaDetalleResponse;
 import org.proyecto2.proyecto2.dtos.propuesta.PropuestaRequest;
 import org.proyecto2.proyecto2.dtos.propuesta.PropuestaResponse;
 import org.proyecto2.proyecto2.dtos.propuesta.PropuestaUpdate;
+import org.proyecto2.proyecto2.exceptions.EntityAlreadyExistsException;
 import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
 import org.proyecto2.proyecto2.security.Secured;
@@ -37,6 +38,8 @@ public class PropuestaResource {
                     .build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
+        } catch (EntityAlreadyExistsException e) {
+            return errorEjecucion(e.getMessage(), 2);
         } catch (SQLException e) {
             return errorEjecucion(e.getMessage(), 3);
         }
@@ -107,7 +110,63 @@ public class PropuestaResource {
             return Response.ok("{\"message\": \"Propuesta actualizada exitosamente\"}").build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
-        }  catch (SQLException e) {
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @PUT
+    @Secured
+    @Path("/aceptar/{propuestaId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response aceptarPropuesta(@PathParam("propuestaId") int propuestaId, @Context ContainerRequestContext request) {
+        try {
+            String rol = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
+            PropuestaService propuestaService = new PropuestaService();
+            propuestaService.updatePropuestaEstadoAceptar(propuestaId, EnumUsuario.valueOf(rol),  usuarioId);
+            return Response.ok("{\"message\": \"Propuesta aceptada y contrato creado exitosamente\"}").build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (EntityAlreadyExistsException e) {
+            return errorEjecucion(e.getMessage(), 2);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @PUT
+    @Secured
+    @Path("/retirar/{propuestaId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response retirarPropuesta(@PathParam("propuestaId") int propuestaId, @Context ContainerRequestContext request) {
+        try {
+            String rol = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
+            PropuestaService propuestaService = new PropuestaService();
+            propuestaService.updatePropuestaEstadoRetirado(propuestaId, usuarioId, EnumUsuario.valueOf(rol));
+            return Response.ok("{\"message\": \"Propuesta retirada exitosamente\"}").build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @PUT
+    @Secured
+    @Path("/rechazar/{propuestaId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response rechazarPropuesta(@PathParam("propuestaId") int propuestaId, @Context ContainerRequestContext request) {
+        try {
+            String rol = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
+            PropuestaService propuestaService = new PropuestaService();
+            propuestaService.updatePropuestaEstadoRechazado(propuestaId, usuarioId, EnumUsuario.valueOf(rol));
+            return Response.ok("{\"message\": \"Propuesta rechazada exitosamente\"}").build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
             return errorEjecucion(e.getMessage(), 3);
         }
     }

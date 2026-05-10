@@ -1,5 +1,9 @@
 package org.proyecto2.proyecto2.models.contrato;
 
+import org.apache.commons.lang3.StringUtils;
+import org.proyecto2.proyecto2.dtos.contrato.ContratoCancelado;
+import org.proyecto2.proyecto2.dtos.contrato.ContratoFinalizado;
+
 import java.time.LocalDate;
 
 public class Contrato {
@@ -27,6 +31,19 @@ public class Contrato {
         this.propuestaId = propuestaId;
         this.estado = EnumContrato.ACTIVO;
         this.fechaCreacion = LocalDate.now();
+    }
+
+    public Contrato(ContratoFinalizado contratoFinalizado) {
+        this.contratoId = contratoFinalizado.getContratoId();
+        this.comentario =  contratoFinalizado.getComentario();
+        this.calificacion = contratoFinalizado.getCalificacion();
+        this.fechaFinalizacion = LocalDate.now();
+    }
+
+    public Contrato(ContratoCancelado contratoCancelado) {
+        this.contratoId = contratoCancelado.getContratoId();
+        this.motivoCancelacion = contratoCancelado.getMotivoCancelacion();
+        this.fechaFinalizacion = LocalDate.now();
     }
 
     public int getContratoId() {
@@ -97,5 +114,18 @@ public class Contrato {
         return propuestaId > 0
                 && estado != null
                 && fechaCreacion != null;
+    }
+
+    public boolean isValidFinalizado() {
+        return contratoId > 0
+                && StringUtils.isNotBlank(comentario)
+                && calificacion >= 1 && calificacion <= 5
+                && fechaFinalizacion != null;
+    }
+
+    public boolean isValidCancelado() {
+        return contratoId > 0
+                && StringUtils.isNotBlank(motivoCancelacion)
+                && fechaFinalizacion != null;
     }
 }

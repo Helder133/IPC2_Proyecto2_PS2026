@@ -52,13 +52,24 @@ public class ProyectoService {
         proyectoDAO.update(proyecto);
     }
 
-    public void updateProyectoEstado(EnumProyecto estado, int usuarioId, int proyectoId, EnumUsuario rol) throws SQLException, UserDataInvalidException {
-        if (!EnumUsuario.Cliente.equals(rol))
-            throw new UserDataInvalidException("El usuario no tiene permisos para actualizar el estado de un proyecto.");
+    public void updateProyectoEstadoCancelacion(int proyectoId, Connection connection) throws SQLException {
         ProyectoDAO proyectoDAO = new ProyectoDAO();
-        if (!proyectoDAO.existsProyectoUsuario(proyectoId, usuarioId))
-            throw new UserDataInvalidException("El proyecto no existe o no pertenece al usuario.");
-        proyectoDAO.updateEstado(estado, proyectoId);
+        proyectoDAO.updateEstado(EnumProyecto.CANCELADO, proyectoId, connection);
+    }
+
+    public void updateProyectoEstadoEnProgreso(int proyectoId, Connection connection) throws SQLException {
+        ProyectoDAO proyectoDAO = new ProyectoDAO();
+        proyectoDAO.updateEstado(EnumProyecto.EN_PROGRESO, proyectoId, connection);
+    }
+
+    public void updateProyectoEstadoEntregaPendiente(int proyectoId, Connection connection) throws SQLException {
+        ProyectoDAO proyectoDAO = new ProyectoDAO();
+        proyectoDAO.updateEstado(EnumProyecto.ENTREGA_PENDIENTE, proyectoId, connection);
+    }
+
+    public void updateProyectoEstadoCompletado(int proyectoId, Connection connection) throws SQLException {
+        ProyectoDAO proyectoDAO = new ProyectoDAO();
+        proyectoDAO.updateEstado(EnumProyecto.COMPLETADO, proyectoId, connection);
     }
 
     public void updateProyectoEstadoCancelacion(int proyectoId, int usuarioId, EnumUsuario rol) throws SQLException, UserDataInvalidException {

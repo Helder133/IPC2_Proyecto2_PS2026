@@ -106,6 +106,14 @@ public class ProyectoDAO implements CRUD<Proyecto> {
         }
     }
 
+    public void updateEstado(EnumProyecto estado, int proyectoId, Connection connection) throws SQLException {
+        try (PreparedStatement update = connection.prepareStatement(UPDATE_PROYECTO_ESTADO)) {
+            update.setString(1, estado.name());
+            update.setInt(2, proyectoId);
+            update.executeUpdate();
+        }
+    }
+
     public void updateEstadoCancelado(int proyectoId) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
         try (PreparedStatement update = connection.prepareStatement(UPDATE_PROYECTO_ESTADO_CANCELADO)) {
