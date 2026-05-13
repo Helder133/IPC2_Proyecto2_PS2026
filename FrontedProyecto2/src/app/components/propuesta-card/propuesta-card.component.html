@@ -1,0 +1,65 @@
+<div class="card bg-secondary text-light shadow-sm border-0 h-100"
+    [ngClass]="{'border-info border': propuesta.estado === enumPropuesta.Aceptada}">
+    <div class="card-body d-flex flex-column">
+
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div class="flex-grow-1 me-2">
+                @if (vistaRol === 'cliente' && isDetalle(propuesta)) {
+                <h6 class="fw-bold text-info mb-1">{{ propuesta.nombreCompleto }}</h6>
+
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-dark border border-secondary text-light opacity-75"
+                        style="font-size: 0.7rem;">
+                        <i class="fa-solid fa-at"></i>{{ propuesta.userName }}
+                    </span>
+                    <small class="text-warning" style="font-size: 0.8rem;">
+                        <i class="fa-solid fa-star"></i> {{ propuesta.promedioCalificacion | number:'1.1-1' }}
+                        <span class="text-light opacity-50">({{ propuesta.totalCalificacion }})</span>
+                    </small>
+                </div>
+                } @else {
+                <h6 class="fw-bold text-info mb-0 text-wrap">
+                    {{ (propuesta.proyectoTitulo) ? propuesta.proyectoTitulo : 'Propuesta #' + propuesta.propuestaId }}
+                </h6>
+                <small class="text-light opacity-50">ID Proyecto: {{ propuesta.proyectoId }}</small>
+                }
+            </div>
+
+            <span class="badge shadow-sm" [ngClass]="{
+                'bg-info text-dark': propuesta.estado === enumPropuesta.Pendiente,
+                'bg-success': propuesta.estado === enumPropuesta.Aceptada,
+                'bg-danger': propuesta.estado === enumPropuesta.Rechazada,
+                'bg-secondary text-light border border-light opacity-75': propuesta.estado === enumPropuesta.Retirado
+            }">
+                {{ propuesta.estado }}
+            </span>
+        </div>
+
+        <p class="small text-light opacity-75 mb-3 flex-grow-1 border-start border-3 border-dark ps-2 mt-2">
+            {{ propuesta.descripcion }}
+        </p>
+
+        <div class="d-flex justify-content-between align-items-end border-top border-dark pt-3 mt-auto">
+            <div>
+                <div class="small text-light opacity-50 lh-1">Tu Oferta</div>
+                <div class="text-warning fw-bold fs-6">Q {{ propuesta.monto | number:'1.2-2' }}</div>
+            </div>
+            <div class="text-end">
+                <div class="small text-light opacity-50 lh-1">Plazo</div>
+                <div class="text-white fw-bold">{{ propuesta.tiempoEntrega }} días</div>
+            </div>
+        </div>
+
+        @if (vistaRol === 'cliente' && propuesta.estado === enumPropuesta.Pendiente) {
+        <div class="d-flex gap-2 mt-3 pt-3 border-top border-dark">
+            <button class="btn btn-sm btn-outline-danger w-50" (click)="onRechazar.emit(propuesta.propuestaId)">
+                Rechazar
+            </button>
+            <button class="btn btn-sm btn-info fw-bold text-dark w-50" (click)="onAceptar.emit(propuesta.propuestaId)">
+                Aceptar
+            </button>
+        </div>
+        }
+
+    </div>
+</div>

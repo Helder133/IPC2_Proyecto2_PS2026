@@ -10,6 +10,7 @@ import org.proyecto2.proyecto2.models.contrato.Contrato;
 import org.proyecto2.proyecto2.models.propuesta.EnumPropuesta;
 import org.proyecto2.proyecto2.models.propuesta.Propuesta;
 import org.proyecto2.proyecto2.models.propuesta.PropuestaDetalle;
+import org.proyecto2.proyecto2.models.propuesta.PropuestaHistorial;
 import org.proyecto2.proyecto2.models.proyecto.Proyecto;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
 import org.proyecto2.proyecto2.models.usuario.Usuario;
@@ -153,5 +154,12 @@ public class PropuestaService {
             throw new UserDataInvalidException("Solo los clientes pueden ver las propuestas de un proyecto");
         PropuestaDAO propuestaDAO = new PropuestaDAO();
         return propuestaDAO.getAllPropuestaForAProyecto(proyectoId, usuarioId);
+    }
+
+    public List<PropuestaHistorial> getHistorialPropuestasFreelancer(int usuarioId, String estado, EnumUsuario rol) throws SQLException {
+        if (!EnumUsuario.Freelancer.equals(rol))
+            throw new UserDataInvalidException("Solo los freelancers pueden ver el historial de sus propuestas");
+        PropuestaDAO propuestaDAO = new PropuestaDAO();
+        return propuestaDAO.getHistorialPropuestasFreelancer(usuarioId, estado);
     }
 }

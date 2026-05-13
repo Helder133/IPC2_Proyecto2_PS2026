@@ -8,9 +8,17 @@ import org.proyecto2.proyecto2.dtos.entrega.EntregaRequest;
 import org.proyecto2.proyecto2.dtos.entrega.EntregaUpdate;
 import org.proyecto2.proyecto2.exceptions.EntityAlreadyExistsException;
 import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
+import org.proyecto2.proyecto2.models.configuracionSistema.ConfiguracionSistema;
 import org.proyecto2.proyecto2.models.entrega.Entrega;
+import org.proyecto2.proyecto2.models.propuesta.Propuesta;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
+import org.proyecto2.proyecto2.models.usuario.cartera.Cartera;
+import org.proyecto2.proyecto2.models.usuario.cartera.CarteraPlataforma;
+import org.proyecto2.proyecto2.services.configuracionSistema.ConfiguracionSistemaService;
+import org.proyecto2.proyecto2.services.propuesta.PropuestaService;
 import org.proyecto2.proyecto2.services.proyecto.ProyectoService;
+import org.proyecto2.proyecto2.services.usuario.cartera.CarteraPlataformaService;
+import org.proyecto2.proyecto2.services.usuario.cartera.CarteraService;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -30,7 +38,7 @@ public class EntregaService {
             if (entregaDAO.existsEntregaPendiente(entrega.getContratoId(), connection))
                 throw new EntityAlreadyExistsException("Ya existe una entrega pendiente para este contrato");
             entregaDAO.insert(entrega, connection);
-            int proyectoId = entregaDAO.getTheProyectoId(entrega.getContratoId(), connection);
+            int proyectoId = entregaDAO.getTheProyectoIdByContratoId(entrega.getContratoId(), connection);
             ProyectoService proyectoService = new ProyectoService();
             proyectoService.updateProyectoEstadoEntregaPendiente(proyectoId, connection);
             connection.commit();
@@ -63,7 +71,7 @@ public class EntregaService {
         EntregaDAO entregaDAO = new EntregaDAO();
         try {
             entregaDAO.updateEntregaEstadoRechazado(entrega, connection);
-            int proyectoId = entregaDAO.getTheProyectoId(entrega.getContratoId(), connection);
+            int proyectoId = entregaDAO.getTheProyectoIdByEntregaId(entrega.getEntregaId(), connection);
             ProyectoService proyectoService = new ProyectoService();
             proyectoService.updateProyectoEstadoEnProgreso(proyectoId, connection);
             connection.commit();
@@ -75,7 +83,7 @@ public class EntregaService {
         }
     }
 
-    public void aprobarEntrega(int entregaId, EnumUsuario rol, ContratoFinalizado contratoFinalizado) throws SQLException {
+    public void aprobarEntrega(int entregaId, int usuarioId, EnumUsuario rol, ContratoFinalizado contratoFinalizado) throws SQLException {
         if (!EnumUsuario.Cliente.equals(rol))
             throw new UserDataInvalidException("Solo los clientes pueden aprobar entregas");
         Connection connection = DBConnection.getInstance().getConnection();
@@ -83,10 +91,37 @@ public class EntregaService {
         EntregaDAO entregaDAO = new EntregaDAO();
         try {
             entregaDAO.updateEntregaEstadoAprobado(entregaId, connection);
-            int proyectoId = entregaDAO.getTheProyectoId(entregaId, connection);
+
+            int proyectoId = entregaDAO.getTheProyectoIdByEntregaId(entregaId, connection);
             ProyectoService proyectoService = new ProyectoService();
             proyectoService.updateProyectoEstadoCompletado(proyectoId, connection);
-            //logica para pagar al freelancer y para restar la comicion de la plataforma
+
+            int propuestaId = entregaDAO.getThePropuestaIdByEntregaId(entregaId, connection);
+            PropuestaService propuestaService = new PropuestaService();
+            Propuesta propuesta = propuestaService.getPropuestaById(propuestaId, connection);
+
+            CarteraService carteraService = new CarteraService();
+            Cartera carteraCliente = carteraService.getCarteraById(usuarioId);
+            if (carteraCliente.getSaldoBloqueado() < propuesta.getMonto())
+                throw new UserDataInvalidException("El cliente no tiene saldo bloqueado suficiente para aprobar la entrega");
+            carteraCliente.setSaldoBloqueado(carteraCliente.getSaldoBloqueado() - propuesta.getMonto());
+            carteraService.pagoCartera(connection, carteraCliente, propuesta.getMonto());
+
+            Cartera carteraFreelancer = carteraService.getCarteraById(propuesta.getUsuarioId());
+            ConfiguracionSistemaService configuracionSistemaService = new ConfiguracionSistemaService();
+            ConfiguracionSistema configuracionSistema = configuracionSistemaService.getUltimaConfiguracionSistema(connection);
+            double comisionPlataforma = propuesta.getMonto() * configuracionSistema.getComision();
+            double montoFreelancer = propuesta.getMonto() - comisionPlataforma;
+            carteraFreelancer.setSaldo(carteraFreelancer.getSaldo() + montoFreelancer);
+            carteraService.pagoCartera(connection, carteraFreelancer, montoFreelancer);
+
+            CarteraPlataformaService carteraPlataformaService = new CarteraPlataformaService();
+            CarteraPlataforma carteraPlataforma = carteraPlataformaService.getCarteraPlataforma();
+            carteraPlataforma.setSaldo(carteraPlataforma.getSaldo() + comisionPlataforma);
+
+            int contratoId = entregaDAO.getTheContratoIdByEntregaId(entregaId, connection);
+            carteraPlataformaService.updateCarteraPlataforma(connection, carteraPlataforma, contratoId, configuracionSistema.getComision(), comisionPlataforma);
+
             connection.commit();
         } catch (SQLException | UserDataInvalidException | EntityAlreadyExistsException e) {
             connection.rollback();

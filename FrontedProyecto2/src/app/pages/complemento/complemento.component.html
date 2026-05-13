@@ -1,0 +1,32 @@
+<div class="container-fluid bg-dark text-light min-vh-100 py-5 d-flex align-items-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <div class="card bg-secondary text-light shadow-lg" style="border-radius: 15px;">
+                    <div class="card-body p-4 p-md-5">
+
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold">Último Paso</h2>
+                            <p class="text-light opacity-75">
+                                Necesitamos un poco más de información para configurar tu perfil de {{ rolUsuario() }}.
+                            </p>
+                        </div>
+
+                        @if (errorMessage()) {
+                        <div class="alert alert-danger">{{ errorMessage() }}</div>
+                        }
+
+                        @if (rolUsuario() === enumUsuario.Cliente) {
+                        <app-complemento-cliente-component [isLoading]="isLoading()"
+                            (formSubmit)="onClienteSubmit($event)"></app-complemento-cliente-component>
+                        } @else if (rolUsuario() === enumUsuario.Freelancer) {
+                        <app-complemento-freelancer-component [isLoading]="isLoading()"
+                            (formSubmit)="onFreelancerSubmit($event)"></app-complemento-freelancer-component>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

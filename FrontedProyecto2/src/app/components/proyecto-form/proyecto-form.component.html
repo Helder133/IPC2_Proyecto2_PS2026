@@ -1,0 +1,61 @@
+<div class="card bg-secondary text-light shadow-sm border-0">
+    <div class="card-body p-4">
+        @if (errorMessage()) { <div class="alert alert-danger">{{ errorMessage() }}</div> }
+
+        <form [formGroup]="proyectoForm" (ngSubmit)="enviar()">
+            <div class="mb-3">
+                <label class="form-label small text-light opacity-75">Título del Proyecto</label>
+                <input type="text" class="form-control bg-dark text-light border-secondary" formControlName="titulo">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label small text-light opacity-75">Descripción Detallada</label>
+                <textarea class="form-control bg-dark text-light border-secondary" formControlName="descripcion"
+                    rows="4"></textarea>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label small text-light opacity-75">Categoría</label>
+                    <select class="form-select bg-dark text-light border-secondary" formControlName="categoriaId">
+                        <option value="">Selecciona una...</option>
+                        @for (cat of categorias; track cat.categoriaId) {
+                        <option [value]="cat.categoriaId">{{ cat.nombre }}</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-light opacity-75">Presupuesto (Q)</label>
+                    <input type="number" class="form-control bg-dark text-light border-secondary"
+                        formControlName="presupuesto" step="0.01">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-light opacity-75">Fecha Límite</label>
+                    <input type="date" class="form-control bg-dark text-light border-secondary"
+                        formControlName="fechaLimite">
+                </div>
+            </div>
+
+            @if (!isUpdateMode) {
+            <h6 class="text-white border-bottom border-dark pb-2 mb-3">Habilidades Requeridas</h6>
+            <div class="d-flex flex-wrap gap-2 mb-4">
+                @for (hab of habilidadesDisponibles; track hab.habilidadId) {
+                <button type="button" class="badge border p-2 px-3 rounded-pill transition"
+                    [ngClass]="habilidadesSeleccionadas().includes(hab.habilidadId) ? 'bg-info text-dark border-info' : 'bg-dark text-light opacity-75 border-secondary'"
+                    (click)="toggleHabilidad(hab.habilidadId)">
+                    {{ hab.nombre }}
+                </button>
+                }
+            </div>
+            }
+
+            <div class="d-flex justify-content-end gap-2 border-top border-dark pt-4">
+                <button type="button" class="btn btn-outline-light" (click)="onCancel.emit()">Cancelar</button>
+                <button type="submit" class="btn btn-info fw-bold text-dark px-4" [disabled]="isLoading">
+                    @if (isLoading) { <span class="spinner-border spinner-border-sm me-2 text-dark"></span> }
+                    {{ isUpdateMode ? 'Guardar Cambios' : 'Publicar Proyecto' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

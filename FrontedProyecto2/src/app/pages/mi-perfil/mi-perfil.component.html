@@ -1,0 +1,132 @@
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+
+            <div class="card bg-secondary text-light shadow-sm border-0">
+                <div class="card-header border-bottom border-dark py-3 d-flex align-items-center">
+                    <div class="bg-dark rounded-circle d-flex justify-content-center align-items-center me-3"
+                        style="width: 50px; height: 50px;">
+                        <i class="fa-solid fa-user-astronaut fs-3 text-info"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 text-white">Mi Perfil</h4>
+                        <small class="text-info">{{ usuarioActual()?.rol }}</small>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    @if (errorMessage()) { <div class="alert alert-danger">{{ errorMessage() }}</div> }
+                    @if (successMessage()) { <div class="alert alert-success">{{ successMessage() }}</div> }
+
+                    <form [formGroup]="perfilForm" (ngSubmit)="actualizarPerfil()">
+
+                        <h6 class="text-white border-bottom border-dark pb-2 mb-3">Información Personal</h6>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label text-light opacity-75 small">Nombre Completo</label>
+                                <input type="text" class="form-control bg-dark text-light border-secondary"
+                                    formControlName="nombreCompleto">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-light opacity-75 small">Nombre de Usuario</label>
+                                <input type="text" class="form-control bg-dark text-light border-secondary"
+                                    formControlName="userName">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-light opacity-75 small">Correo Electrónico</label>
+                                <input type="email" class="form-control bg-dark text-light border-secondary"
+                                    formControlName="email">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-light opacity-75 small">Teléfono</label>
+                                <input type="text" class="form-control bg-dark text-light border-secondary"
+                                    formControlName="telefono">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-light opacity-75 small">CUI</label>
+                                <input type="text" class="form-control bg-dark text-light border-secondary"
+                                    formControlName="cui">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-light opacity-75 small">Fecha de Nacimiento</label>
+                                <input type="date" class="form-control bg-dark text-light border-secondary"
+                                    formControlName="fechaNacimiento">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label text-light opacity-75 small">Dirección Físca</label>
+                                <input type="text" class="form-control bg-dark text-light border-secondary"
+                                    formControlName="direccion">
+                            </div>
+                        </div>
+
+                        @if (usuarioActual()?.rol === enumUsuario.Cliente) {
+                        <h6 class="text-white border-bottom border-dark pb-2 mb-3 mt-4">Datos de Empresa / Proyecto</h6>
+                        <div class="row g-3 mb-4" formGroupName="clienteUpdate">
+                            <div class="col-12">
+                                <label class="form-label text-light opacity-75 small">Descripción</label>
+                                <textarea class="form-control bg-dark text-light border-secondary"
+                                    formControlName="descripcion" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-light opacity-75 small">Sector</label>
+                                <input type="text" class="form-control bg-dark text-light border-secondary"
+                                    formControlName="sector">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-light opacity-75 small">Sitio Web</label>
+                                <input type="text" class="form-control bg-dark text-light border-secondary"
+                                    formControlName="sitioWeb">
+                            </div>
+                        </div>
+                        }
+
+                        @if (usuarioActual()?.rol === enumUsuario.Freelancer) {
+                        <h6 class="text-white border-bottom border-dark pb-2 mb-3 mt-4">Perfil Profesional</h6>
+                        <div class="row g-3 mb-4" formGroupName="freelancerUpdate">
+                            <div class="col-12">
+                                <label class="form-label text-light opacity-75 small">Sobre ti</label>
+                                <textarea class="form-control bg-dark text-light border-secondary"
+                                    formControlName="descripcion" rows="3"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-light opacity-75 small">Experiencia</label>
+                                <select class="form-select bg-dark text-light border-secondary"
+                                    formControlName="experiencia">
+                                    <option value="Junior">Junior</option>
+                                    <option value="Semi_Senior">Semi-Senior</option>
+                                    <option value="Senior">Senior</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-light opacity-75 small">Tarifa por Hora (Q)</label>
+                                <input type="number" class="form-control bg-dark text-light border-secondary"
+                                    formControlName="tarifaHora" step="0.01">
+                            </div>
+                        </div>
+                        }
+
+                        <h6 class="text-white border-bottom border-dark pb-2 mb-3 mt-4">Seguridad</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label text-light opacity-75 small">Nueva Contraseña</label>
+                                <input type="password" class="form-control bg-dark text-light border-secondary"
+                                    formControlName="password" placeholder="Deja en blanco para no cambiarla">
+                            </div>
+                        </div>
+
+                        <div class="text-end border-top border-dark pt-3 mt-4">
+                            <button type="submit" class="btn btn-info fw-bold text-dark px-5" [disabled]="isLoading()">
+                                @if (isLoading()) { <span
+                                    class="spinner-border spinner-border-sm me-2 text-dark"></span> }
+                                Guardar Cambios
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -4,6 +4,7 @@ import org.proyecto2.proyecto2.db.config.DBConnection;
 import org.proyecto2.proyecto2.models.entrega.Entrega;
 import org.proyecto2.proyecto2.models.entrega.EnumEntrega;
 
+import java.security.PublicKey;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +17,57 @@ public class EntregaDAO {
     private static final String UPDATE_ENTREGA_ESTADO_APROBADO = "UPDATE entrega SET estado = 'APROBADA' WHERE entrega_id = ?";
     private static final String GET_ENTREGA_BY_ID = "SELECT * FROM entrega WHERE entrega_id = ?";
     private static final String GET_ALL_ENTREGAS_OF_A_CONTRACT = "SELECT * FROM entrega WHERE contrato_id = ?";
-    private static final String GET_THE_PROYECTO_ID = "SELECT pr.proyecto_id FROM entrega e JOIN contrato c ON e.contrato_id = c.contrato_id JOIN propuesta p ON c.propuesta_id = p.propuesta_id JOIN proyecto pr ON p.proyecto_id = pr.proyecto_id WHERE e.contrato_id = ?";
+    private static final String GET_THE_PROYECTO_ID_BY_CONTRATO_ID = "SELECT p.proyecto_id FROM contrato c JOIN propuesta p ON c.propuesta_id = p.propuesta_id WHERE c.contrato_id = ?";
+    private static final String GET_THE_PROYECTO_ID_BY_ENTREGA_ID = "SELECT p.proyecto_id FROM entrega e JOIN contrato c ON e.contrato_id = c.contrato_id JOIN propuesta p ON c.propuesta_id = p.propuesta_id WHERE e.entrega_id = ?";
+    private static final String GET_THE_PROPUESTA_ID_BY_ENTREGA_ID = "SELECT c.propuesta_id FROM entrega e JOIN contrato c ON e.contrato_id = c.contrato_id WHERE e.entrega_id = ?";
+    private static final String GET_THE_CONTRATO_ID_BY_ENTREGA_ID = "SELECT contrato_id FROM entrega WHERE entrega_id = ?";
     private static final String EXISTS_ENTREGA_PENDIENTE = "SELECT 1 FROM entrega WHERE contrato_id = ? AND estado = 'PENDIENTE'";
 
-    public int getTheProyectoId(int contratoId, Connection connection) throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(GET_THE_PROYECTO_ID)) {
+    public int getTheContratoIdByEntregaId(int entregaId, Connection connection) throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(GET_THE_CONTRATO_ID_BY_ENTREGA_ID)) {
+            preparedStatement.setInt(1, entregaId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("contrato_id");
+                } else {
+                    throw new SQLException("No se encontró el contrato para el entrega ID: " + entregaId);
+                }
+            }
+        }
+    }
+
+    public int getTheProyectoIdByContratoId(int contratoId, Connection connection) throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(GET_THE_PROYECTO_ID_BY_CONTRATO_ID)) {
             preparedStatement.setInt(1, contratoId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     return resultSet.getInt("proyecto_id");
+                } else {
+                    throw new SQLException("No se encontró el proyecto para el contrato ID: " + contratoId);
+                }
+            }
+        }
+    }
+
+    public int getTheProyectoIdByEntregaId(int entregaId, Connection connection) throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(GET_THE_PROYECTO_ID_BY_ENTREGA_ID)) {
+            preparedStatement.setInt(1, entregaId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("proyecto_id");
+                } else {
+                    throw new SQLException("No se encontró el proyecto para el contrato ID: " + entregaId);
+                }
+            }
+        }
+    }
+
+    public int getThePropuestaIdByEntregaId(int contratoId, Connection connection) throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(GET_THE_PROPUESTA_ID_BY_ENTREGA_ID)) {
+            preparedStatement.setInt(1, contratoId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("propuesta_id");
                 } else {
                     throw new SQLException("No se encontró el proyecto para el contrato ID: " + contratoId);
                 }

@@ -1,0 +1,90 @@
+<form [formGroup]="usuarioForm" (ngSubmit)="submitForm()">
+    <div class="row g-3">
+
+        <div class="col-md-6">
+            <label class="form-label">Nombre Completo</label>
+            <input type="text" class="form-control bg-dark text-light border-secondary"
+                formControlName="nombreCompleto">
+            @if (usuarioForm.get('nombreCompleto')?.invalid && usuarioForm.get('nombreCompleto')?.touched) {
+            <small class="text-warning">Nombre requerido.</small>
+            }
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Nombre de Usuario</label>
+            <input type="text" class="form-control bg-dark text-light border-secondary" formControlName="userName">
+            @if (usuarioForm.get('userName')?.invalid && usuarioForm.get('userName')?.touched) {
+            <small class="text-warning">Usuario requerido.</small>
+            }
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Correo Electrónico</label>
+            <input type="email" class="form-control bg-dark text-light border-secondary" formControlName="email">
+            @if (usuarioForm.get('email')?.invalid && usuarioForm.get('email')?.touched) {
+            <small class="text-warning">Correo válido requerido.</small>
+            }
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Contraseña</label>
+            <input type="password" class="form-control bg-dark text-light border-secondary" formControlName="password">
+            @if (usuarioForm.get('password')?.invalid && usuarioForm.get('password')?.touched) {
+            <small class="text-warning">Contraseña requerida.</small>
+            }
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Teléfono</label>
+            <input type="text" class="form-control bg-dark text-light border-secondary" formControlName="telefono">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">CUI</label>
+            <input type="text" class="form-control bg-dark text-light border-secondary" formControlName="cui"
+                placeholder="13 dígitos">
+            @if (usuarioForm.get('cui')?.invalid && usuarioForm.get('cui')?.touched) {
+            <small class="text-warning">CUI inválido.</small>
+            }
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Fecha de Nacimiento</label>
+            <input type="date" class="form-control bg-dark text-light border-secondary"
+                formControlName="fechaNacimiento">
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Dirección</label>
+            <input type="text" class="form-control bg-dark text-light border-secondary" formControlName="direccion">
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">¿Qué deseas ser en la plataforma?</label>
+            <select class="form-select bg-dark text-light border-secondary" formControlName="rol">
+                <option value="" disabled selected>Selecciona un rol...</option>
+
+                @if (isAdminMode) {
+                <option [value]="EnumUsuario.Administrador">Administrador</option>
+                } @else {
+                <option [value]="EnumUsuario.Cliente">Quiero contratar (Cliente)</option>
+                <option [value]="EnumUsuario.Freelancer">Quiero trabajar (Freelancer)</option>
+                }
+            </select>
+            @if (usuarioForm.get('rol')?.invalid && usuarioForm.get('rol')?.touched) {
+            <small class="text-warning">Debes seleccionar un rol.</small>
+            }
+        </div>
+
+        <div class="col-12 mt-4">
+            <button type="submit" class="btn btn-info w-100 fw-bold text-dark" [disabled]="isLoading">
+                @if (isLoading) {
+                <span class="spinner-border spinner-border-sm me-2"></span> Guardando...
+                } @else {
+                Registrarse
+                }
+            </button>
+        </div>
+
+    </div>
+</form>

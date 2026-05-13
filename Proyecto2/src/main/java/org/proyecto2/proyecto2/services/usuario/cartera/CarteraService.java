@@ -64,4 +64,12 @@ public class CarteraService {
         TransaccionService transaccionService = new TransaccionService();
         transaccionService.createTransaccion(connection, cartera.getUsuarioId(), EnumTransaccion.Devolucion, monto);
     }
+
+    public void pagoCartera(Connection connection, Cartera cartera, double monto) throws SQLException {
+        CarteraDAO carteraDAO = new CarteraDAO();
+        carteraDAO.update(connection, cartera);
+        TransaccionService transaccionService = new TransaccionService();
+        transaccionService.createTransaccion(connection, cartera.getUsuarioId(), EnumTransaccion.Pago, monto);
+    }
+
 }

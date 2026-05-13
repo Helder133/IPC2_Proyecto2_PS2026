@@ -2,8 +2,10 @@ package org.proyecto2.proyecto2.dtos.categoria;
 
 import org.proyecto2.proyecto2.models.categoria.Categoria;
 
-public class CategoriaResponse extends CategoriaRequest{
+public class CategoriaResponse{
     private int categoriaId;
+    private String nombre;
+    private String descripcion;
     private boolean estado;
 
     public CategoriaResponse(Categoria categoria) {
@@ -19,6 +21,22 @@ public class CategoriaResponse extends CategoriaRequest{
 
     public void setCategoriaId(int categoriaId) {
         this.categoriaId = categoriaId;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public boolean isEstado() {

@@ -33,6 +33,15 @@ public class CategoriaDAO implements CRUD<Categoria> {
         }
     }
 
+    public boolean validNombre(String nombre, Connection connection) throws SQLException {
+        try (PreparedStatement validNombre = connection.prepareStatement(VALID_NOMBRE)) {
+            validNombre.setString(1, nombre);
+            try (ResultSet rs = validNombre.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
     public boolean validNombreUpdate(String nombre, int categoriaId) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
         try (PreparedStatement validNombreUpdate = connection.prepareStatement(VALID_NOMBRE_UPDATE)) {
@@ -47,6 +56,14 @@ public class CategoriaDAO implements CRUD<Categoria> {
     @Override
     public void insert(Categoria categoria) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
+        try (PreparedStatement insertCategoria = connection.prepareStatement(INSERT_CATEGORIA)) {
+            insertCategoria.setString(1, categoria.getNombre());
+            insertCategoria.setString(2, categoria.getDescripcion());
+            insertCategoria.executeUpdate();
+        }
+    }
+
+    public void insert(Categoria categoria, Connection connection) throws SQLException {
         try (PreparedStatement insertCategoria = connection.prepareStatement(INSERT_CATEGORIA)) {
             insertCategoria.setString(1, categoria.getNombre());
             insertCategoria.setString(2, categoria.getDescripcion());

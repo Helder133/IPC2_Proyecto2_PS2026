@@ -123,8 +123,9 @@ public class EntregaResource {
     public Response aprobarEntrega(ContratoFinalizado contratoFinalizado, @Context ContainerRequestContext request, @PathParam("entregaId") int entregaId) {
         try {
             String rol = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
             EntregaService entregaService = new EntregaService();
-            entregaService.aprobarEntrega(entregaId, EnumUsuario.valueOf(rol), contratoFinalizado);
+            entregaService.aprobarEntrega(entregaId, usuarioId, EnumUsuario.valueOf(rol), contratoFinalizado);
             return Response.ok("{\"message\": \"Entrega aprobada exitosamente\"}").build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);

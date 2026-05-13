@@ -1,0 +1,57 @@
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="text-white mb-0">
+            <i class="fa-solid fa-file-invoice-dollar me-2 text-info"></i>Mis Postulaciones
+        </h4>
+        <span class="badge bg-dark border border-secondary text-light opacity-75">
+            Total: {{ propuestas().length }}
+        </span>
+    </div>
+
+    <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
+        <button class="btn btn-sm px-3 rounded-pill transition"
+            [ngClass]="filtroActual() === 'TODAS' ? 'btn-info text-dark fw-bold' : 'btn-outline-light'"
+            (click)="cambiarFiltro('TODAS')">Todas</button>
+
+        <button class="btn btn-sm px-3 rounded-pill transition"
+            [ngClass]="filtroActual() === 'PENDIENTE' ? 'btn-info text-dark fw-bold' : 'btn-outline-light'"
+            (click)="cambiarFiltro('PENDIENTE')">Pendientes</button>
+
+        <button class="btn btn-sm px-3 rounded-pill transition"
+            [ngClass]="filtroActual() === 'ACEPTADA' ? 'btn-success fw-bold' : 'btn-outline-light'"
+            (click)="cambiarFiltro('ACEPTADA')">Aceptadas</button>
+
+        <button class="btn btn-sm px-3 rounded-pill transition"
+            [ngClass]="filtroActual() === 'RECHAZADA' ? 'btn-danger fw-bold' : 'btn-outline-light'"
+            (click)="cambiarFiltro('RECHAZADA')">Rechazadas</button>
+    </div>
+
+    @if (isLoading()) {
+    <div class="text-center py-5 text-info">
+        <span class="spinner-border"></span>
+        <p class="mt-2">Cargando tu historial...</p>
+    </div>
+    } @else {
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 align-items-stretch">
+        @for (prop of propuestas(); track prop.propuestaId) {
+        <div class="col d-flex flex-column">
+
+            <div class="flex-grow-1" (click)="verProyecto(prop.proyectoId)" style="cursor: pointer;">
+                <app-propuesta-card-component [propuesta]="prop" vistaRol="freelancer" class="h-100 d-block"></app-propuesta-card-component>
+            </div>
+
+            @if (prop.estado === 'ACEPTADA') {
+            <button class="btn btn-success btn-sm w-100 fw-bold mt-2 shadow">
+                <i class="fa-solid fa-file-contract me-1"></i> Ir al Contrato
+            </button>
+            }
+        </div>
+        } @empty {
+        <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-box-open fs-1 text-light opacity-25 mb-3 d-block"></i>
+            <p class="text-light opacity-50">No se encontraron propuestas en esta categoría.</p>
+        </div>
+        }
+    </div>
+    }
+</div>

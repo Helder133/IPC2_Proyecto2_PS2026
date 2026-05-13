@@ -5,10 +5,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.proyecto2.proyecto2.dtos.propuesta.PropuestaDetalleResponse;
-import org.proyecto2.proyecto2.dtos.propuesta.PropuestaRequest;
-import org.proyecto2.proyecto2.dtos.propuesta.PropuestaResponse;
-import org.proyecto2.proyecto2.dtos.propuesta.PropuestaUpdate;
+import org.proyecto2.proyecto2.dtos.propuesta.*;
 import org.proyecto2.proyecto2.exceptions.EntityAlreadyExistsException;
 import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
@@ -91,6 +88,28 @@ public class PropuestaResource {
             return Response.ok(propuestaResponses).build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @GET
+    @Path("/usuario/historial/{estado}")
+    @Secured
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getHistorialFreelancer(@Context ContainerRequestContext request, @PathParam("estado") String estado) {
+        try {
+            int usuarioId = (int) request.getProperty("usuarioId");
+            String rol = (String) request.getProperty("rol");
+            PropuestaService propuestaService = new PropuestaService();
+
+            String filtro = (estado == null || estado.trim().isEmpty()) ? "TODAS" : estado;
+
+            List<PropuestaHistorialResponse> historial = propuestaService.getHistorialPropuestasFreelancer(usuarioId, filtro, EnumUsuario.valueOf(rol))
+                    .stream()
+                    .map(PropuestaHistorialResponse::new)
+                    .toList();;
+            return Response.ok(historial).build();
         } catch (SQLException e) {
             return errorEjecucion(e.getMessage(), 3);
         }

@@ -49,7 +49,7 @@ public class Proyecto {
     public Proyecto(ProyectoUpdate proyectoUpdate) {
         this.proyectoId = proyectoUpdate.getProyectoId();
         this.categoriaId = proyectoUpdate.getCategoriaId();
-        this.titulo = proyectoUpdate.getNombre();
+        this.titulo = proyectoUpdate.getTitulo();
         this.descripcion = proyectoUpdate.getDescripcion();
         this.presupuesto = proyectoUpdate.getPresupuesto();
         this.fechaLimite = proyectoUpdate.getFechaLimite();

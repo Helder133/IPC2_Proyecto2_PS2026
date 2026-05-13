@@ -17,9 +17,11 @@ import org.proyecto2.proyecto2.models.usuario.Usuario;
 import org.proyecto2.proyecto2.models.usuario.cartera.Cartera;
 import org.proyecto2.proyecto2.models.usuario.cartera.CarteraPlataforma;
 import org.proyecto2.proyecto2.models.usuario.cartera.Transaccion;
+import org.proyecto2.proyecto2.models.usuario.cartera.TransaccionPlataforma;
 import org.proyecto2.proyecto2.models.usuario.freelancer.FreelancerHabilidad;
 import org.proyecto2.proyecto2.services.usuario.cartera.CarteraPlataformaService;
 import org.proyecto2.proyecto2.services.usuario.cartera.CarteraService;
+import org.proyecto2.proyecto2.services.usuario.cartera.TransaccionPlataformaService;
 import org.proyecto2.proyecto2.services.usuario.cartera.TransaccionService;
 import org.proyecto2.proyecto2.services.usuario.cliente.ClienteService;
 import org.proyecto2.proyecto2.services.usuario.freelancer.FreelancerHabilidadService;
@@ -164,9 +166,9 @@ public class UsuarioService {
         usuarioDAO.updateEstado(usuarioId);
     }
 
-    public void insertComplementoCliente(ClienteRequest clienteRequest, EnumUsuario rol) throws SQLException, UserDataInvalidException {
+    public void insertComplementoCliente(ClienteRequest clienteRequest, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException {
         ClienteService clienteService = new ClienteService();
-        clienteService.insertComplemento(clienteRequest, rol);
+        clienteService.insertComplemento(clienteRequest, rol, usuarioId);
     }
 
     public void insertComplementoFreelancer(FreelancerRequest freelancerRequest, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException,EntityAlreadyExistsException {
@@ -194,6 +196,11 @@ public class UsuarioService {
     public List<Transaccion> getTransaccionesByUsuarioId(int usuarioId) throws SQLException {
         TransaccionService transaccionService = new TransaccionService();
         return transaccionService.getTransaccionesByUsuarioId(usuarioId);
+    }
+
+    public List<TransaccionPlataforma> getTransaccionPlataforma() throws SQLException {
+        TransaccionPlataformaService transaccionService = new TransaccionPlataformaService();
+        return transaccionService.getAllTransaccionPlataformas();
     }
 
     public void agregarHabilidadAFreelancer(FreelancerHabilidadRequest freelancerHabilidadRequest, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {

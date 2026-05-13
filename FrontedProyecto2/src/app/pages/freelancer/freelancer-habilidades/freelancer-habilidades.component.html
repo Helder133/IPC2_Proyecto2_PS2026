@@ -1,0 +1,63 @@
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <div class="card bg-secondary text-light shadow-sm border-0 mb-4">
+                <div class="card-header border-bottom border-dark py-3">
+                    <h5 class="mb-0 text-white"><i class="fa-solid fa-wand-magic-sparkles me-2 text-info"></i>Mis
+                        Habilidades Profesionales</h5>
+                    <p class="text-light opacity-75 small mb-0">Agrega las tecnologías y aptitudes que te definen como
+                        freelancer.</p>
+                </div>
+
+                <div class="card-body p-4 text-center">
+                    <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+                        @for (hab of misHabilidades(); track hab.habilidadId) {
+                        <div
+                            class="badge bg-dark border border-info d-flex align-items-center p-2 px-3 rounded-pill shadow-sm">
+                            <span class="me-2 text-info fw-bold">{{ hab.nombre }}</span>
+                            <button class="btn btn-link text-danger p-0 lh-1"
+                                (click)="eliminarHabilidad(hab.habilidadId)" [disabled]="isLoading()">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                            </button>
+                        </div>
+                        } @empty {
+                        <div class="py-4 text-center">
+                            <i class="fa-solid fa-layer-group fs-1 text-dark opacity-50 mb-3"></i>
+                            <p class="text-light opacity-50">Aún no has agregado ninguna habilidad a tu perfil.</p>
+                        </div>
+                        }
+                    </div>
+
+                    <div class="border-top border-dark pt-4">
+                        <h6 class="text-white mb-3">¿Qué más sabes hacer?</h6>
+
+                        <div class="dropdown">
+                            <button class="btn btn-outline-info dropdown-toggle w-100" type="button"
+                                data-bs-toggle="dropdown" [disabled]="isLoading()">
+                                @if (isLoading()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                                Seleccionar una habilidad para agregar...
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark w-100 shadow-lg border-secondary"
+                                style="max-height: 300px; overflow-y: auto;">
+                                @for (hab of habilidadesDisponibles(); track hab.habilidadId) {
+                                <li>
+                                    <button class="dropdown-item py-2 text-wrap" (click)="agregarHabilidad(hab.habilidadId)">
+                                        <div class="fw-bold text-info">{{ hab.nombre }}</div>
+                                        <small class="text-light opacity-75">{{ hab.descripcion }}</small>
+                                    </button>
+                                </li>
+                                } @empty {
+                                <li class="p-3 text-center text-light opacity-75 small">No hay más habilidades disponibles para
+                                    agregar.</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

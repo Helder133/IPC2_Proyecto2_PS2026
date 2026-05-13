@@ -9,7 +9,7 @@ import java.time.LocalDate;
 public class ProyectoUpdate {
     private int proyectoId;
     private int categoriaId;
-    private String nombre;
+    private String titulo;
     private String descripcion;
     private double presupuesto;
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -32,12 +32,12 @@ public class ProyectoUpdate {
         this.categoriaId = categoriaId;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getTitulo() {
+        return titulo;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
 
     public String getDescripcion() {

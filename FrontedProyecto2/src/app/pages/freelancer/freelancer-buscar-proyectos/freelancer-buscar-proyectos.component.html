@@ -1,0 +1,189 @@
+<div class="container-fluid py-4">
+
+    @if (errorMessage() && vistaActual() === 'lista') {
+    <div class="alert alert-danger shadow-sm border-0 mb-4">{{ errorMessage() }}</div>
+    }
+    @if (successMessage()) {
+    <div class="alert alert-success shadow-sm border-0 mb-4">{{ successMessage() }}</div>
+    }
+
+    @if (vistaActual() === 'lista') {
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="text-white mb-0"><i class="fa-solid fa-compass me-2 text-info"></i>Explorar Proyectos</h4>
+    </div>
+
+    <div class="card bg-dark border-secondary shadow-sm mb-4">
+        <div class="card-body p-3">
+            <div class="row g-3 align-items-end">
+
+                <div class="col-md-3">
+                    <label class="form-label small text-light opacity-75 mb-1"><i
+                            class="fa-solid fa-layer-group me-1"></i>Categoría</label>
+                    <select class="form-select form-select-sm bg-secondary text-light border-dark"
+                        (change)="filtrarPorCategoria($event)">
+                        <option value="">Todas las categorías...</option>
+                        @for (cat of categoriasFiltro(); track cat.categoriaId) {
+                        <option [value]="cat.categoriaId">{{ cat.nombre }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label small text-light opacity-75 mb-1"><i
+                            class="fa-solid fa-code me-1"></i>Habilidad</label>
+                    <select class="form-select form-select-sm bg-secondary text-light border-dark"
+                        (change)="filtrarPorHabilidad($event)">
+                        <option value="">Todas las habilidades...</option>
+                        @for (hab of habilidadesFiltro(); track hab.habilidadId) {
+                        <option [value]="hab.habilidadId">{{ hab.nombre }}</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-5">
+                    <label class="form-label small text-light opacity-75 mb-1"><i
+                            class="fa-solid fa-money-bill-wave me-1"></i>Rango de Presupuesto (Q)</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-secondary border-dark text-light">Min</span>
+                        <input type="number" class="form-control bg-secondary text-light border-dark" #minimo min="0"
+                            placeholder="0">
+                        <span class="input-group-text bg-secondary border-dark text-light">Max</span>
+                        <input type="number" class="form-control bg-secondary text-light border-dark" #maximo min="1"
+                            placeholder="9999">
+                        <button class="btn btn-info fw-bold text-dark"
+                            (click)="filtrarPorPresupuesto(minimo, maximo)">Filtrar</button>
+                    </div>
+                </div>
+
+                <div class="col-md-1 text-end">
+                    <button class="btn btn-outline-warning btn-sm w-100" title="Limpiar Filtros"
+                        (click)="limpiarFiltros()">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    @if (isLoading()) {
+    <div class="text-center py-5 text-info">
+        <span class="spinner-border spinner-border-lg"></span>
+        <p class="mt-2">Buscando oportunidades...</p>
+    </div>
+    } @else {
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        @for (proy of proyectos(); track proy.proyectoId) {
+        <div class="col">
+            <app-proyecto-card-component [proyecto]="proy" [vistaRol]="enumUsuario.Freelancer"
+                (onPostular)="iniciarGestionPropuesta($event)">
+            </app-proyecto-card-component>
+        </div>
+        } @empty {
+        <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-mug-hot fs-1 text-light opacity-25 mb-3 d-block"></i>
+            <p class="text-light opacity-50">No hay proyectos abiertos en este momento. Vuelve más tarde.</p>
+        </div>
+        }
+    </div>
+    }
+    }
+
+    @if (vistaActual() === 'gestion' && proyectoSeleccionado()) {
+
+    <div class="d-flex align-items-center mb-4">
+        <button class="btn btn-outline-light btn-sm me-3" (click)="cancelarGestion()" [disabled]="isLoading()">
+            <i class="fa-solid fa-arrow-left"></i> Explorar Proyectos
+        </button>
+        <h4 class="text-white mb-0">Detalles de tu Postulación</h4>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card bg-dark border-secondary text-light shadow-sm sticky-top" style="top: 20px;">
+                <div class="card-body">
+                    <h5 class="text-info">{{ proyectoSeleccionado()!.titulo }}</h5>
+                    <div class="mb-3">
+                        <span class="badge bg-secondary border border-dark text-light opacity-75">
+                            <i class="fa-solid fa-layer-group me-1"></i> {{ proyectoSeleccionado()!.categoria.nombre }}
+                        </span>
+                    </div>
+                    <p class="small opacity-75">{{ proyectoSeleccionado()!.descripcion }}</p>
+
+                    <div class="d-flex flex-wrap gap-1 mb-3">
+                        @for (hab of proyectoSeleccionado()!.habilidadResponses; track hab.habilidadId) {
+                        <span class="badge bg-secondary opacity-75">{{ hab.nombre }}</span>
+                        }
+                    </div>
+
+                    <div class="bg-secondary rounded p-3 mb-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="small opacity-75">Presupuesto Máx:</span>
+                            <span class="fw-bold text-warning">Q {{ proyectoSeleccionado()!.presupuesto | number:'1.2-2'
+                                }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="small opacity-75">Fecha Límite:</span>
+                            <span class="fw-bold">{{ proyectoSeleccionado()!.fechaLimite }}</span>
+                        </div>
+                    </div>
+
+                    @if (miPropuestaActual()) {
+                    <div class="border-top border-secondary pt-3 text-center">
+                        <h6 class="text-white mb-2">Estado de tu Propuesta</h6>
+                        <span class="badge fs-6 mb-3" [ngClass]="{
+                        'bg-info text-dark': miPropuestaActual()!.estado === enumPropuesta.Pendiente,
+                        'bg-success': miPropuestaActual()!.estado === enumPropuesta.Aceptada,
+                        'bg-danger': miPropuestaActual()!.estado === enumPropuesta.Rechazada,
+                        'bg-secondary': miPropuestaActual()!.estado === enumPropuesta.Retirado
+                      }">
+                            {{ miPropuestaActual()!.estado }}
+                        </span>
+
+                        @if (miPropuestaActual()!.estado === enumPropuesta.Pendiente) {
+                        <button class="btn btn-outline-danger w-100 btn-sm" (click)="retirarMiPropuesta()"
+                            [disabled]="isLoading()">
+                            <i class="fa-solid fa-trash me-1"></i> Retirar Propuesta
+                        </button>
+                        }
+                    </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-8 col-lg-7">
+            <div class="card bg-secondary text-light shadow-sm border-0">
+                <div class="card-header border-bottom border-dark py-3">
+                    <h5 class="mb-0 text-white">
+                        <i class="fa-solid" [ngClass]="miPropuestaActual() ? 'fa-pen' : 'fa-paper-plane'"></i>
+                        {{ miPropuestaActual() ? 'Actualizar tu Propuesta' : 'Redactar Propuesta' }}
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+
+                    @if (errorMessage()) { <div class="alert alert-danger">{{ errorMessage() }}</div> }
+
+                    @if (miPropuestaActual() && miPropuestaActual()!.estado !== enumPropuesta.Pendiente) {
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-lock fs-1 text-light opacity-50 mb-3"></i>
+                        <h5 class="text-white">Formulario Bloqueado</h5>
+                        <p class="text-light opacity-75">Tu propuesta está en estado {{ miPropuestaActual()!.estado }}.
+                            Ya no es posible modificarla ni retirarla.</p>
+                    </div>
+                    } @else {
+                    <app-propuesta-form-component [presupuestoMaximo]="proyectoSeleccionado()!.presupuesto"
+                        [propuestaActual]="miPropuestaActual()" [isLoading]="isLoading()"
+                        (formSubmit)="procesarFormulario($event)">
+                    </app-propuesta-form-component>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    }
+
+</div>

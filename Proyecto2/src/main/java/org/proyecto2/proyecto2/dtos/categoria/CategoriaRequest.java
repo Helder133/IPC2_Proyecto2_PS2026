@@ -1,8 +1,8 @@
 package org.proyecto2.proyecto2.dtos.categoria;
 
 public class CategoriaRequest {
-    protected String nombre;
-    protected String descripcion;
+    private String nombre;
+    private String descripcion;
 
     public String getNombre() {
         return nombre;

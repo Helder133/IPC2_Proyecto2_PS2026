@@ -16,6 +16,7 @@ import org.proyecto2.proyecto2.security.Secured;
 import org.proyecto2.proyecto2.services.habilidad.HabilidadService;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Path("/habilidad")
@@ -39,6 +40,27 @@ public class HabilidadResource {
             return errorEjecucion(e.getMessage(), 1);
         } catch (EntityAlreadyExistsException e) {
             return errorEjecucion(e.getMessage(), 2);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
+    @GET
+    @Secured
+    @Path("/no-registrados/freelancer")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllHabilidadesNoRegistradosEnUsuario(@Context ContainerRequestContext request) {
+        try {
+            String rol = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
+            HabilidadService habilidadService = new HabilidadService();
+            List<HabilidadResponse> habilidades = habilidadService.getAllHabilidadesNoRegistradosEnUsuario(EnumUsuario.valueOf(rol), usuarioId)
+                    .stream()
+                    .map(HabilidadResponse::new)
+                    .toList();
+            return Response.ok(habilidades).build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
         } catch (SQLException e) {
             return errorEjecucion(e.getMessage(), 3);
         }

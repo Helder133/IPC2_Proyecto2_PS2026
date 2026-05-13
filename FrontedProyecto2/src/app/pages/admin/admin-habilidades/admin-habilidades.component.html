@@ -1,0 +1,63 @@
+<div class="container-fluid py-4">
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card bg-secondary shadow-sm border-0 sticky-top" style="top: 20px;">
+                <div class="card-header border-bottom border-dark">
+                    <h5 class="mb-0 text-white">
+                        <i class="fa-solid fa-bolt me-2 text-info"></i>
+                        {{ isEditing() ? 'Editar Habilidad' : 'Nueva Habilidad' }}
+                    </h5>
+                </div>
+                <div class="card-body">
+
+                    @if (errorMessage()) {
+                    <div class="alert alert-danger py-2 text-center shadow-sm">
+                        <i class="fa-solid fa-triangle-exclamation me-1"></i> {{ errorMessage() }}
+                    </div>
+                    }
+
+                    @if (!isEditing()) {
+                    <app-catalogo-form-component [tipoForzado]="CatalogoEnum.Habilidad" [isLoading]="isLoading()"
+                        (formSubmit)="procesarFormulario($event)">
+                    </app-catalogo-form-component>
+                    } @else {
+                    <app-catalogo-form-component [isUpdateMode]="true" [datosIniciales]="itemAEditar()"
+                        [isLoading]="isLoading()" (formSubmit)="procesarFormulario($event)"
+                        (onCancel)="cancelarEdicion()">
+                    </app-catalogo-form-component>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="text-white mb-0"><i class="fa-solid fa-list me-2"></i>Catálogo de Habilidades</h4>
+                <div class="input-group shadow-sm" style="max-width: 300px;">
+                    <span class="input-group-text bg-dark border-secondary text-info">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" class="form-control bg-dark text-light border-secondary"
+                        placeholder="Buscar habilidad..." (input)="buscarHabilidad($event)">
+                </div>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+                @for (hab of habilidades(); track hab.id) {
+                <div class="col">
+                    <app-catalogo-card-component [item]="hab" (onEdit)="iniciarEdicion($event)"
+                        (onToggleEstado)="cambiarEstado($event)">
+                    </app-catalogo-card-component>
+                </div>
+                } @empty {
+                <div class="col-12 text-center py-5">
+                    <p class="text-light opacity-75">No hay habilidades registradas en el sistema.</p>
+                </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>

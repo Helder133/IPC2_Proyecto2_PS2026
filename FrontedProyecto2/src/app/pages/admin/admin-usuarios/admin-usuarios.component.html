@@ -1,0 +1,135 @@
+<div class="container-fluid py-4">
+    <div class="row g-4">
+
+        <div class="col-xl-3 col-lg-4">
+            <div class="card bg-secondary text-light shadow-sm border-0 sticky-top" style="top: 20px;">
+                <div class="card-header border-bottom border-dark">
+                    <h5 class="mb-0 text-white"><i class="fa-solid fa-user-shield me-2 text-info"></i>Nuevo
+                        Administrador</h5>
+                </div>
+                <div class="card-body">
+                    @if (errorMessage()) { <div class="alert alert-danger py-2">{{ errorMessage() }}</div> }
+                    @if (successMessage()) { <div class="alert alert-success py-2">{{ successMessage() }}</div> }
+
+                    <form [formGroup]="adminForm" (ngSubmit)="crearAdmin()">
+                        <div class="mb-2">
+                            <label class="form-label text-white small mb-1">Nombre Completo</label>
+                            <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                                formControlName="nombreCompleto">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label text-white small mb-1">Username</label>
+                            <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                                formControlName="userName">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label text-white small mb-1">Contraseña</label>
+                            <input type="password"
+                                class="form-control form-control-sm bg-dark text-light border-secondary"
+                                formControlName="password">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label text-white small mb-1">Email</label>
+                            <input type="email" class="form-control form-control-sm bg-dark text-light border-secondary"
+                                formControlName="email">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label text-white small mb-1">Teléfono</label>
+                            <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                                formControlName="telefono">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label text-white small mb-1">CUI</label>
+                            <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                                formControlName="cui">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label text-white small mb-1">Dirección</label>
+                            <input type="text" class="form-control form-control-sm bg-dark text-light border-secondary"
+                                formControlName="direccion">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-white small mb-1">Nacimiento</label>
+                            <input type="date" class="form-control form-control-sm bg-dark text-light border-secondary"
+                                formControlName="fechaNacimiento">
+                        </div>
+
+                        <button type="submit" class="btn btn-info btn-sm w-100 fw-bold text-dark"
+                            [disabled]="isLoading()">
+                            @if (isLoading()) { <span class="spinner-border spinner-border-sm me-2 text-dark"></span> }
+                            Crear Admin
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-9 col-lg-8">
+            <div class="card bg-secondary text-light shadow-sm border-0">
+                <div
+                    class="card-header border-bottom border-dark py-3 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <h5 class="mb-0 text-white"><i class="fa-solid fa-users me-2"></i>Gestión de Usuarios</h5>
+
+                    <div class="input-group input-group-sm shadow-sm" style="max-width: 350px;">
+                        <span class="input-group-text bg-dark border-secondary text-info">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" class="form-control bg-dark text-light border-secondary"
+                            placeholder="Buscar por nombre, usuario o email..." (input)="buscarUsuario($event)">
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover text-white mb-0 align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Usuario</th>
+                                    <th>Rol</th>
+                                    <th>Email / Tel</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (user of usuarios(); track user.usuarioId) {
+                                <tr>
+                                    <td>#{{ user.usuarioId }}</td>
+                                    <td>
+                                        <div class="fw-bold text-info">{{ user.userName }}</div>
+                                        <small class="text-light opacity-75">{{ user.nombreCompleto }}</small>
+                                    </td>
+                                    <td><span class="badge bg-secondary border border-light">{{ user.rol }}</span></td>
+                                    <td>
+                                        <div class="small">{{ user.email }}</div>
+                                        <div class="small text-light opacity-75">{{ user.telefono }}</div>
+                                    </td>
+                                    <td>
+                                        @if (user.estado) { <span class="badge bg-success">Activo</span> }
+                                        @else { <span class="badge bg-danger">Inactivo</span> }
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm" [class.btn-outline-danger]="user.estado"
+                                            [class.btn-outline-success]="!user.estado"
+                                            (click)="cambiarEstado(user.usuarioId)">
+                                            <i class="fa-solid" [class.fa-ban]="user.estado"
+                                                [class.fa-check]="!user.estado"></i>
+                                            {{ user.estado ? 'Desactivar' : 'Activar' }}
+                                        </button>
+                                    </td>
+                                </tr>
+                                } @empty {
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-light opacity-75">No hay usuarios
+                                        registrados.</td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

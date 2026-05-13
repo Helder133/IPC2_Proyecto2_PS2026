@@ -5,10 +5,10 @@ import org.proyecto2.proyecto2.models.usuario.freelancer.EnumFreelancer;
 import java.util.List;
 
 public class FreelancerRequest {
-    protected int usuarioId;
-    protected String descripcion;
-    protected EnumFreelancer experiencia;
-    protected double tarifaHora;
+    private int usuarioId;
+    private String descripcion;
+    private EnumFreelancer experiencia;
+    private double tarifaHora;
     private List<FreelancerHabilidadRequest> habilidadesRequest;
 
     public int getUsuarioId() {

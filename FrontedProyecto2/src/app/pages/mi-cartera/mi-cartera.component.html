@@ -1,0 +1,102 @@
+<div class="container-fluid py-4">
+    <div class="row g-4 justify-content-center">
+
+        @if (rolActual !== enumUsuario.Administrador) {
+        <div class="col-xl-4 col-lg-5">
+            <div class="card bg-secondary text-light shadow-sm border-0 sticky-top" style="top: 20px;">
+                <div class="card-header border-bottom border-dark py-3">
+                    <h5 class="mb-0 text-white"><i class="fa-solid fa-wallet me-2 text-info"></i>Recargar Saldo</h5>
+                </div>
+                <div class="card-body p-4">
+
+                    @if (errorMessage()) { <div class="alert alert-danger py-2">{{ errorMessage() }}</div> }
+                    @if (successMessage()) { <div class="alert alert-success py-2">{{ successMessage() }}</div> }
+
+                    <form [formGroup]="recargaForm" (ngSubmit)="realizarRecarga()">
+                        <div class="mb-4">
+                            <label class="form-label text-white">Monto a recargar (Q)</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-dark text-success border-secondary fw-bold">Q</span>
+                                <input type="number" class="form-control bg-dark text-light border-secondary fs-4"
+                                    formControlName="monto" step="0.01">
+                            </div>
+                            @if (recargaForm.get('monto')?.invalid && recargaForm.get('monto')?.touched) {
+                            <small class="text-warning">Monto inválido. Debe ser mayor a 0.</small>
+                            }
+                        </div>
+
+                        <button type="submit" class="btn btn-info btn-lg w-100 fw-bold text-dark"
+                            [disabled]="isLoading()">
+                            @if (isLoading()) { <span class="spinner-border spinner-border-sm me-2 text-dark"></span> }
+                            Confirmar Pago
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        }
+
+        <div [class]="rolActual === enumUsuario.Administrador ? 'col-12' : 'col-xl-8 col-lg-7'">
+            <div class="card bg-secondary text-light shadow-sm border-0">
+                <div class="card-header border-bottom border-dark py-3">
+                    <h5 class="mb-0 text-white"><i class="fa-solid fa-money-bill-transfer me-2"></i>Historial de
+                        Transacciones</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover mb-0 align-middle text-white">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fecha</th>
+
+                                    @if (rolActual === enumUsuario.Administrador) {
+                                    <th>ID Contrato</th>
+                                    <th>% Comisión</th>
+                                    <th>Monto Comisión</th>
+                                    } @else {
+                                    <th>Tipo</th>
+                                    <th>Monto</th>
+                                    }
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (tx of transacciones(); track tx.transaccionId) {
+                                <tr>
+                                    <td class="text-info fw-bold">#{{ tx.transaccionId }}</td>
+                                    <td>{{ tx.fecha }}</td>
+
+                                    @if (rolActual === enumUsuario.Administrador) {
+                                    <td>Contrato #{{ tx.contratoId }}</td>
+                                    <td>{{ tx.porcentajeAplicado }}%</td>
+                                    <td class="text-success fw-bold">+ Q {{ tx.monto_comision | number:'1.2-2' }}</td>
+                                    } @else {
+                                    <td>
+                                        <span class="badge bg-dark border border-secondary">{{ tx.tipo }}</span>
+                                    </td>
+                                    <td
+                                        [ngClass]="{'text-success': tx.tipo === 'Recarga' || tx.tipo === 'Devolucion' || tx.tipo === 'Pago', 'text-warning': tx.tipo === 'Bloqueo'}">
+                                        Q {{ tx.monto | number:'1.2-2' }}
+                                    </td>
+                                    }
+                                </tr>
+                                } @empty {
+                                <tr>
+                                    <td [colSpan]="rolActual === enumUsuario.Administrador ? 5 : 4"
+                                        class="text-center py-5 text-light opacity-75">
+                                        <i class="fa-solid fa-receipt fs-1 mb-3 d-block opacity-50"></i>
+                                        No tienes transacciones registradas aún.
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

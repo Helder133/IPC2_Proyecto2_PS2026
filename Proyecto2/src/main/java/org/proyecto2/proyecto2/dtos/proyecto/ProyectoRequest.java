@@ -8,17 +8,17 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class ProyectoRequest {
-    protected int usuarioId;
-    protected int categoriaId;
-    protected String titulo;
-    protected String descripcion;
-    protected double presupuesto;
+    private int usuarioId;
+    private int categoriaId;
+    private String titulo;
+    private String descripcion;
+    private double presupuesto;
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    protected LocalDate fechaCreacion;
+    private LocalDate fechaCreacion;
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    protected LocalDate fechaLimite;
+    private LocalDate fechaLimite;
     private List<ProyectoHabilidadRequest> proyectoHabilidadRequest;
 
     public int getUsuarioId() {

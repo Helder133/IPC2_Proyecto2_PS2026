@@ -7,7 +7,7 @@ import org.proyecto2.proyecto2.models.propuesta.EnumPropuesta;
 import org.proyecto2.proyecto2.models.propuesta.PropuestaDetalle;
 
 import java.time.LocalDate;
-
+//A la hora que el cliente quiera ver una propuesta, se le mostrar esta informacion
 public class PropuestaDetalleResponse {
     private int propuestaId;
     private EnumPropuesta estado;

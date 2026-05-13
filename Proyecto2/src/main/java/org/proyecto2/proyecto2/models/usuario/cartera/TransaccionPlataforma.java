@@ -19,6 +19,22 @@ public class TransaccionPlataforma {
         this.fecha = fecha;
     }
 
+    public TransaccionPlataforma(int plataformaId, int contratoId, double porcentajeAplicado, double monto_comision) {
+        this.plataformaId = plataformaId;
+        this.contratoId = contratoId;
+        this.porcentajeAplicado = porcentajeAplicado;
+        this.monto_comision = monto_comision;
+        this.fecha = LocalDate.now();
+    }
+
+    public boolean isValid() {
+        return plataformaId > 0
+                && contratoId > 0
+                && porcentajeAplicado > 0
+                && monto_comision > 0
+                && fecha != null;
+    }
+
     public int getTransaccionId() {
         return transaccionId;
     }

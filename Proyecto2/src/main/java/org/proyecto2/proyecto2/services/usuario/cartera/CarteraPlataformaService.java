@@ -2,6 +2,7 @@ package org.proyecto2.proyecto2.services.usuario.cartera;
 
 import org.proyecto2.proyecto2.db.usuario.cartera.CarteraPlataformaDAO;
 import org.proyecto2.proyecto2.models.usuario.cartera.CarteraPlataforma;
+import org.proyecto2.proyecto2.models.usuario.cartera.TransaccionPlataforma;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -20,9 +21,12 @@ public class CarteraPlataformaService {
         }
     }
 
-    public void updateCarteraPlataforma(Connection connection, CarteraPlataforma carteraPlataforma) throws SQLException {
+    public void updateCarteraPlataforma(Connection connection, CarteraPlataforma carteraPlataforma, int contratoId, double porcentajeAplicado, double montoComision) throws SQLException {
         CarteraPlataformaDAO carteraPlataformaDAO = new CarteraPlataformaDAO();
         carteraPlataformaDAO.updateCarteraPlataforma(connection, carteraPlataforma);
+        TransaccionPlataformaService transaccionPlataformaService = new TransaccionPlataformaService();
+        TransaccionPlataforma transaccionPlataforma = new TransaccionPlataforma(carteraPlataforma.getPlataformaId(), contratoId, porcentajeAplicado, montoComision);
+        transaccionPlataformaService.createTransaccion(transaccionPlataforma, connection);
     }
 
 }

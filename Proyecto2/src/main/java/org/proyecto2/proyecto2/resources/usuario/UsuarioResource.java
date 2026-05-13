@@ -8,10 +8,7 @@ import jakarta.ws.rs.core.Response;
 import org.proyecto2.proyecto2.dtos.usuario.UsuarioRequest;
 import org.proyecto2.proyecto2.dtos.usuario.UsuarioResponse;
 import org.proyecto2.proyecto2.dtos.usuario.UsuarioUpdate;
-import org.proyecto2.proyecto2.dtos.usuario.cartera.CarteraPlataformaResponse;
-import org.proyecto2.proyecto2.dtos.usuario.cartera.CarteraRequest;
-import org.proyecto2.proyecto2.dtos.usuario.cartera.CarteraResponse;
-import org.proyecto2.proyecto2.dtos.usuario.cartera.TransaccionResponse;
+import org.proyecto2.proyecto2.dtos.usuario.cartera.*;
 import org.proyecto2.proyecto2.dtos.usuario.cliente.ClienteRequest;
 import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerHabilidadRequest;
 import org.proyecto2.proyecto2.dtos.usuario.freelancer.FreelancerRequest;
@@ -71,6 +68,7 @@ public class UsuarioResource {
         }
     }
 
+    //Si es su primer inicio de sesion, se redirige de una vez al formulario de complementacion de datos, dependiendo de su rol, si es cliente se le muestra el formulario de complementacion de datos de cliente, si es freelancer se le muestra el formulario de complementacion de datos de freelancer, el admin no tiene formulario de complementacion de datos, hasta que no completen sus datos, np puede ingresar a las demas paginas
     @POST
     @Secured
     @Path("/complemento/cliente")
@@ -79,8 +77,9 @@ public class UsuarioResource {
     public Response createUsuarioComplementoCliente(@Context ContainerRequestContext request, ClienteRequest clienteRequest) {
         try {
             String rolUsuario = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
             UsuarioService usuarioService = new UsuarioService();
-            usuarioService.insertComplementoCliente(clienteRequest, EnumUsuario.valueOf(rolUsuario));
+            usuarioService.insertComplementoCliente(clienteRequest, EnumUsuario.valueOf(rolUsuario), usuarioId);
             return Response.status(Response.Status.CREATED)
                     .entity("{\"mensaje\": \"Complemento de cliente agregado exitosamente\"}")
                     .build();
@@ -186,7 +185,11 @@ public class UsuarioResource {
             int usuarioId = (int) request.getProperty("usuarioId");
             UsuarioService usuarioService = new UsuarioService();
             if (EnumUsuario.Administrador.equals(EnumUsuario.valueOf(rolUsuario))) {
-                return Response.ok().build();
+                List<TransaccionPlataformaResponse> transaccionPlataformaResponseList = usuarioService.getTransaccionPlataforma()
+                        .stream()
+                        .map(TransaccionPlataformaResponse::new)
+                        .toList();
+                return Response.ok(transaccionPlataformaResponseList).build();
             } else {
                 List<TransaccionResponse> transaccionResponses = usuarioService.getTransaccionesByUsuarioId(usuarioId)
                         .stream()

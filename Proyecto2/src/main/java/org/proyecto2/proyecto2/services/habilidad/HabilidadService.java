@@ -8,6 +8,7 @@ import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
 import org.proyecto2.proyecto2.models.habilidad.Habilidad;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,14 @@ public class HabilidadService {
         if (habilidadDAO.validNombre(habilidad.getNombre()))
             throw new EntityAlreadyExistsException("Ya existe una habilidad con el mismo nombre");
         habilidadDAO.insert(habilidad);
+    }
+
+    public void createHabilidad(Habilidad habilidad, Connection connection) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
+        if (!habilidad.isValid()) throw new UserDataInvalidException("Los datos de la habilidad no son válidos");
+        HabilidadDAO habilidadDAO = new HabilidadDAO();
+        if (validNombre(habilidad.getNombre(), connection))
+            throw new EntityAlreadyExistsException("Ya existe una habilidad con el mismo nombre");
+        habilidadDAO.insert(habilidad, connection);
     }
 
     public void updateHabilidad(HabilidadUpdate habilidadUpdate, EnumUsuario rol) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
@@ -64,6 +73,23 @@ public class HabilidadService {
     public List<Habilidad> getAllHabilidadActivada() throws SQLException {
         HabilidadDAO habilidadDAO = new HabilidadDAO();
         return habilidadDAO.getAllHabilidadActivada();
+    }
+
+    public List<Habilidad> getAllHabilidadesNoRegistradosEnUsuario(EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException {
+        if (!EnumUsuario.Freelancer.equals(rol))
+            throw new UserDataInvalidException("No tienes permisos para obtener las habilidades no registradas en un usuario");
+        HabilidadDAO habilidadDAO = new HabilidadDAO();
+        return habilidadDAO.getAllHabilidadesNoRegistradosEnUsuario(usuarioId);
+    }
+
+    public boolean validNombre(String nombre, Connection connection) throws SQLException {
+        HabilidadDAO habilidadDAO = new HabilidadDAO();
+        return habilidadDAO.validNombre(nombre, connection);
+    }
+
+    public boolean validNombre(String nombre) throws SQLException {
+        HabilidadDAO habilidadDAO = new HabilidadDAO();
+        return habilidadDAO.validNombre(nombre);
     }
 
 }

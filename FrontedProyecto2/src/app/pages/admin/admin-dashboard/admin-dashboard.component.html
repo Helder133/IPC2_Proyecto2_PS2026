@@ -1,0 +1,90 @@
+<div class="container-fluid py-4">
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card bg-secondary text-light shadow-sm border-0">
+                <div class="card-header border-bottom border-dark">
+                    <h5 class="mb-0 text-white"><i class="fa-solid fa-gear me-2"></i>Nueva Configuración</h5>
+                </div>
+                <div class="card-body">
+                    @if (errorMessage()) { <div class="alert alert-danger py-2">{{ errorMessage() }}</div> }
+                    @if (successMessage()) { <div class="alert alert-success py-2">{{ successMessage() }}</div> }
+
+                    <form [formGroup]="configForm" (ngSubmit)="onSubmit()">
+                        <div class="mb-3">
+                            <label class="form-label text-white">Porcentaje de Comisión (%)</label>
+                            <input type="number" class="form-control bg-dark text-light border-secondary"
+                                formControlName="comision" step="0.01">
+                            @if (configForm.get('comision')?.invalid && configForm.get('comision')?.touched) {
+                            <small class="text-warning">Comisión inválida.</small>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-white">Fecha de Inicio</label>
+                            <input type="date" class="form-control bg-dark text-light border-secondary"
+                                formControlName="fechaInicio">
+                        </div>
+                        <button type="submit" class="btn btn-info w-100 fw-bold text-dark" [disabled]="isLoading()">
+                            @if (isLoading()) { <span class="spinner-border spinner-border-sm me-2 text-dark"></span> }
+                            Guardar
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card bg-dark text-light shadow-sm border border-secondary mt-4">
+                <div class="card-body text-center">
+                    <h6 class="text-light opacity-75">Comisión Actual Activa</h6>
+                    @if (configActual()) {
+                    <h2 class="text-info fw-bold mb-0">{{ configActual()?.comision }}%</h2>
+                    <small class="text-light opacity-75">Desde: {{ configActual()?.fechaInicio }}</small>
+                    } @else {
+                    <p class="mb-0 text-warning">No hay configuración activa</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card bg-secondary text-light shadow-sm border-0">
+                <div class="card-header border-bottom border-dark">
+                    <h5 class="mb-0 text-white"><i class="fa-solid fa-clock-rotate-left me-2"></i>Historial de
+                        Configuraciones</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover text-white mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Comisión</th>
+                                    <th>Fecha Inicio</th>
+                                    <th>Fecha Fin</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (item of historial(); track item.configuracionId) {
+                                <tr>
+                                    <td>#{{ item.configuracionId }}</td>
+                                    <td class="text-info fw-bold">{{ item.comision }}%</td>
+                                    <td>{{ item.fechaInicio }}</td>
+                                    <td>
+                                        @if (item.fechaFin) { {{ item.fechaFin }} }
+                                        @else { <span class="badge bg-success text-white">ACTIVA</span> }
+                                    </td>
+                                </tr>
+                                } @empty {
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-light opacity-75">No hay registros en
+                                        el historial.</td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

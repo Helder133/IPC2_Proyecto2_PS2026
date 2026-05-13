@@ -8,17 +8,17 @@ import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
 import java.time.LocalDate;
 
 public class UsuarioRequest {
-    protected String nombreCompleto;
-    protected String userName;
-    protected String password;
-    protected String email;
-    protected String telefono;
-    protected String direccion;
-    protected String cui;
+    private String nombreCompleto;
+    private String userName;
+    private String password;
+    private String email;
+    private String telefono;
+    private String direccion;
+    private String cui;
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    protected LocalDate fechaNacimiento;
-    protected EnumUsuario rol;
+    private LocalDate fechaNacimiento;
+    private EnumUsuario rol;
 
     public String getPassword() {
         return password;

@@ -56,5 +56,4 @@ public class LoginResource {
         }
         return null;
     }
-
 }

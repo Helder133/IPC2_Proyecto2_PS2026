@@ -1,8 +1,8 @@
 package org.proyecto2.proyecto2.dtos.usuario.cartera;
 
 public class CarteraRequest {
-    protected int usuarioId;
-    protected double monto;
+    private int usuarioId;
+    private double monto;
 
     public int getUsuarioId() {
         return usuarioId;

@@ -16,6 +16,10 @@ public class Categoria {
         this.descripcion = descripcion;
         this.estado = estado;
     }
+    public Categoria(String nombre, String descripcion) {
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+    }
 
     public Categoria(CategoriaRequest categoriaRequest) {
         this.nombre = categoriaRequest.getNombre();

@@ -22,9 +22,9 @@ public class ProyectoDAO implements CRUD<Proyecto> {
     private static final String GET_ALL_PROYECTO = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id";
     private static final String GET_PROYECTO_BY_ID = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.proyecto_id = ?";
     private static final String VALID_PROYECTO_USUARIO = "SELECT 1 FROM proyecto WHERE proyecto_id = ? AND usuario_id = ?";
-    private static final String GET_ALL_PROYECTO_BY_CATEGORIA = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.categoria_id = ?";
-    private static final String GET_ALL_PROYECTO_BY_PRESUPUESTO = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.presupuesto BETWEEN ? AND ?";
-    private static final String GET_ALL_PROYECTO_BY_HABILIDAD = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id JOIN proyecto_habilidad ph ON p.proyecto_id = ph.proyecto_id WHERE ph.habilidad_id = ?";
+    private static final String GET_ALL_PROYECTO_BY_CATEGORIA = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.categoria_id = ? AND p.estado = 'ABIERTO'";
+    private static final String GET_ALL_PROYECTO_BY_PRESUPUESTO = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.presupuesto BETWEEN ? AND ? AND p.estado = 'ABIERTO'";
+    private static final String GET_ALL_PROYECTO_BY_HABILIDAD = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id JOIN proyecto_habilidad ph ON p.proyecto_id = ph.proyecto_id WHERE ph.habilidad_id = ? AND p.estado = 'ABIERTO'";
     private static final String GET_ALL_PROYECTO_IN_ABIERTO_ESTADO = "SELECT p.*, c.nombre, c.descripcion, c.estado AS estado_categoria FROM proyecto p JOIN categoria c ON p.categoria_id = c.categoria_id WHERE p.estado = 'ABIERTO'";
 
     public boolean existsProyectoUsuario(int proyectoId, int usuarioId) throws SQLException {

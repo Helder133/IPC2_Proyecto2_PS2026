@@ -16,6 +16,11 @@ CREATE TABLE IF NOT EXISTS usuario (
 	estado BOOL NOT NULL DEFAULT 1
 );
 
+SELECT * FROM usuario ;
+SELECT * FROM freelancer;
+SELECT * FROM freelancer_habilidad;
+SELECT * FROM cliente;
+SELECT * FROM cartera;
 -- password 123
 INSERT INTO usuario (nombre_completo,user_name,password,email,telefono,direccion,cui,fecha_nacimiento,rol) VALUES (
 'Admin',
@@ -84,6 +89,8 @@ CREATE TABLE IF NOT EXISTS freelancer_habilidad (
 	CONSTRAINT fk_habilidad FOREIGN KEY (habilidad_id) REFERENCES habilidad (habilidad_id)
 );
 
+
+
 SELECT * FROM usuario;
 SELECT * FROM cliente;
 SELECT * FROM freelancer;
@@ -94,6 +101,8 @@ SELECT * FROM proyecto_habilidad;
 SELECT * FROM freelancer_habilidad;
 
 SELECT h.* FROM freelancer_habilidad fh JOIN habilidad h ON fh.habilidad_id = h.habilidad_id WHERE fh.usuario_id = 3;
+
+SELECT * FROM categoria;
 
 CREATE TABLE IF NOT EXISTS categoria (
 	categoria_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
@@ -146,7 +155,7 @@ CREATE TABLE IF NOT EXISTS propuesta (
 	CONSTRAINT fk_freelancer2 FOREIGN KEY (usuario_id) REFERENCES freelancer (usuario_id)
 );
 
-SELECT 1 FROM propuesta WHERE propuesta_id = 2 AND usuario_id = 3 ;
+SELECT * FROM propuesta WHERE propuesta_id = 2 AND usuario_id = 3 ;
 
 
 
@@ -163,6 +172,7 @@ CREATE TABLE IF NOT EXISTS contrato (
 	calificacion INT CHECK (calificacion >= 1 AND calificacion <= 5),
 	CONSTRAINT fk_propuesta FOREIGN KEY (propuesta_id) REFERENCES propuesta (propuesta_id)
 );
+
 SELECT * FROM proyecto;
 SELECT * FROM propuesta;
 SELECT * FROM contrato;
@@ -181,8 +191,17 @@ CREATE TABLE IF NOT EXISTS entrega (
 	CONSTRAINT fk_contrato FOREIGN KEY (contrato_id) REFERENCES contrato (contrato_id)
 );
 
-SELECT pr.proyecto_id FROM entrega e JOIN contrato c ON e.contrato_id = c.contrato_id JOIN propuesta p ON c.propuesta_id = p.propuesta_id JOIN proyecto pr ON p.proyecto_id = pr.proyecto_id WHERE e.contrato_id = 1;
+SELECT p.proyecto_id FROM entrega e JOIN contrato c ON e.contrato_id = c.contrato_id JOIN propuesta p ON c.propuesta_id = p.propuesta_id WHERE e.entrega_id = 1;
+SELECT p.proyecto_id FROM contrato c JOIN propuesta p ON c.propuesta_id = p.propuesta_id WHERE c.contrato_id = 1;
+SELECT c.propuesta_id FROM entrega e JOIN contrato c ON e.contrato_id = c.contrato_id WHERE e.entrega_id  = 1;
+SELECT contrato_id FROM entrega WHERE entrega_id = 1;
 
+select * from entrega;
+select * from contrato;
+select * from propuesta;
+
+SELECT p.propuesta_id FROM entrega e JOIN contrato c ON e.contrato_id = c.contrato_id JOIN propuesta p ON c.propuesta_id = p.propuesta_id WHERE e.contrato_id = 1;
+SELECT c.contrato_id FROM entrega e JOIN contrato c ON e.contrato_id = c.contrato_id WHERE e.
 CREATE TABLE IF NOT EXISTS cartera_plataforma (
 	plataforma_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
 	saldo DECIMAL(10,2) NOT NULL
@@ -212,6 +231,10 @@ CREATE TABLE IF NOT EXISTS nueva_h_c (
 	CONSTRAINT fk_usuario3 FOREIGN KEY (usuario_id) REFERENCES usuario(usuario_id)
 );
 
+SELECT * FROM configuracion_sistema ORDER BY configuracion_id DESC LIMIT 1;
+SELECT configuracion_id FROM configuracion_sistema ORDER BY configuracion_id DESC LIMIT 1;
+SELECT * FROM configuracion_sistema;
+
 CREATE TABLE IF NOT EXISTS configuracion_sistema (
 	configuracion_id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	comision DECIMAL(10,2) NOT NULL,
@@ -220,11 +243,15 @@ CREATE TABLE IF NOT EXISTS configuracion_sistema (
 );
 
 
+INSERT INTO configuracion_sistema (comision, fecha_inicio) VALUES (0.15, '2004-01-01');
+INSERT INTO configuracion_sistema (comision, fecha_inicio) VALUES (0.1, '2004-02-01');
+UPDATE configuracion_sistema SET fecha_fin = '2004-02-01' WHERE configuracion_id = 2;
+
 SELECT p.propuesta_id, p.proyecto_id, p.monto, p.tiempo_entrega, p.descripcion, p.estado, p.fecha_creacion, u.usuario_id, u.nombre_completo, u.user_name, COALESCE(cal.promedio_calificacion, 0) AS promedio_calificacion, COALESCE(cal.total_calificaciones, 0) AS total_calificaciones FROM propuesta p INNER JOIN usuario u ON p.usuario_id = u.usuario_id LEFT JOIN (SELECT p2.usuario_id, COUNT(c.calificacion) AS total_calificaciones, AVG(c.calificacion) AS promedio_calificacion FROM propuesta p2 INNER JOIN contrato c ON p2.propuesta_id = c.propuesta_id GROUP BY p2.usuario_id) cal ON p.usuario_id = cal.usuario_id JOIN proyecto p3 on p.proyecto_id = p3.proyecto_id WHERE p.proyecto_id = ? AND p3.usuario_id = ?;
 
 
 
 
-
+SELECT h.* FROM habilidad h LEFT JOIN freelancer_habilidad fh ON h.habilidad_id = fh.habilidad_id AND fh.usuario_id = ? WHERE fh.habilidad_id IS NULL AND h.estado = 1;
 
 

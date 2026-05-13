@@ -21,8 +21,8 @@ public class ProyectoService {
         if (!EnumUsuario.Cliente.equals(rol))
             throw new UserDataInvalidException("El usuario no tiene permisos para crear un proyecto.");
         Proyecto proyecto = new Proyecto(proyectoRequest);
-        if (!proyecto.isValid()) throw new UserDataInvalidException("Los datos del proyecto no son válidos.");
         proyecto.setUsuarioId(usuarioId);
+        if (!proyecto.isValid()) throw new UserDataInvalidException("Los datos del proyecto no son válidos.");
         ProyectoDAO proyectoDAO = new ProyectoDAO();
         Connection connection = DBConnection.getInstance().getConnection();
         connection.setAutoCommit(false);

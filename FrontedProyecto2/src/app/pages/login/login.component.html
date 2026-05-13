@@ -1,0 +1,75 @@
+<div class="container-fluid bg-dark text-light min-vh-100 d-flex align-items-center justify-content-center">
+
+    <div class="card bg-secondary text-light shadow-lg" style="width: 100%; max-width: 400px; border-radius: 15px;">
+        <div class="card-body p-5">
+
+            <div class="text-center mb-4">
+                <i class="fa-solid fa-user-astronaut fa-3x mb-3 text-info"></i>
+                <h2 class="fw-bold">Iniciar Sesión</h2>
+                <p class="text-light opacity-75">Bienvenido a la plataforma</p>
+            </div>
+
+            @if (errorMessage()) {
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                <i class="fa-solid fa-circle-exclamation me-2"></i>
+                <div>{{ errorMessage() }}</div>
+            </div>
+            }
+
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+                <div class="mb-3">
+                    <label for="username" class="form-label">Nombre de Usuario o Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-light">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input type="text" id="username" class="form-control bg-dark text-light border-secondary"
+                            formControlName="username" placeholder="Ingresa tu usuario">
+                    </div>
+
+                    @if (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) {
+                    <small class="text-warning">
+                        El usuario es requerido.
+                    </small>
+                    }
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-light">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input type="password" id="password" class="form-control bg-dark text-light border-secondary"
+                            formControlName="password" placeholder="••••••••">
+                    </div>
+
+                    @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+                    <small class="text-warning">
+                        La contraseña es requerida.
+                    </small>
+                    }
+                </div>
+
+                <button type="submit" class="btn btn-info w-100 fw-bold py-2 text-dark" [disabled]="isLoading()">
+
+                    @if (isLoading()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Verificando...
+                    } @else {
+                    Entrar
+                    }
+
+                </button>
+
+            </form>
+            <div class="text-center mt-4">
+                <p class="mb-0 text-light opacity-75">
+                    ¿No tienes una cuenta?
+                    <a routerLink="/register" class="text-info fw-bold text-decoration-none">Regístrate aquí</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

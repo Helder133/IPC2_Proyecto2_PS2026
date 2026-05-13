@@ -7,14 +7,14 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import java.time.LocalDate;
 
 public class PropuestaRequest {
-    protected int proyectoId;
-    protected int usuarioId;
-    protected double monto;
-    protected int tiempoEntrega;
-    protected String descripcion;
+    private int proyectoId;
+    private int usuarioId;
+    private double monto;
+    private int tiempoEntrega;
+    private String descripcion;
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    protected LocalDate fechaCreacion;
+    private LocalDate fechaCreacion;
 
     public int getProyectoId() {
         return proyectoId;

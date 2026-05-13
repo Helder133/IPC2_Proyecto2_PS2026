@@ -1,10 +1,10 @@
 package org.proyecto2.proyecto2.dtos.usuario.cliente;
 
 public class ClienteRequest {
-    protected int usuarioId;
-    protected String descripcion;
-    protected String sector;
-    protected String sitioWeb;
+    private int usuarioId;
+    private String descripcion;
+    private String sector;
+    private String sitioWeb;
 
     public int getUsuarioId() {
         return usuarioId;

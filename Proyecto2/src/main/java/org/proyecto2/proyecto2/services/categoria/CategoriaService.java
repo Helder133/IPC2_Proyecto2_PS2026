@@ -8,12 +8,13 @@ import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
 import org.proyecto2.proyecto2.models.categoria.Categoria;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 public class CategoriaService {
-    public void insert(CategoriaRequest categoriaRequest, EnumUsuario rol) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
+    public void createCategoria(CategoriaRequest categoriaRequest, EnumUsuario rol) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
         if (!EnumUsuario.Administrador.equals(rol))
             throw new UserDataInvalidException("No tiene el permiso para crear una categoria");
         Categoria categoria = new Categoria(categoriaRequest);
@@ -23,6 +24,15 @@ public class CategoriaService {
         if (categoriaDAO.validNombre(categoria.getNombre()))
             throw new EntityAlreadyExistsException("El nombre ya existe");
         categoriaDAO.insert(categoria);
+    }
+
+    public void createCategoria(Categoria categoria, Connection connection) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
+        if (!categoria.isValid())
+            throw new UserDataInvalidException("El nombre y la descripción son obligatorios");
+        CategoriaDAO categoriaDAO = new CategoriaDAO();
+        if (validNombre(categoria.getNombre(), connection))
+            throw new EntityAlreadyExistsException("El nombre ya existe");
+        categoriaDAO.insert(categoria, connection);
     }
 
     public void update(CategoriaUpdate categoriaUpdate, EnumUsuario rol) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
@@ -66,5 +76,15 @@ public class CategoriaService {
     public List<Categoria> getAllCategoriaActivadas() throws SQLException {
         CategoriaDAO categoriaDAO = new CategoriaDAO();
         return categoriaDAO.getAllCategoriaActivada();
+    }
+
+    public boolean validNombre(String nombre, Connection connection) throws SQLException {
+        CategoriaDAO categoriaDAO = new CategoriaDAO();
+        return categoriaDAO.validNombre(nombre, connection);
+    }
+
+    public boolean validNombre(String nombre) throws SQLException {
+        CategoriaDAO categoriaDAO = new CategoriaDAO();
+        return categoriaDAO.validNombre(nombre);
     }
 }

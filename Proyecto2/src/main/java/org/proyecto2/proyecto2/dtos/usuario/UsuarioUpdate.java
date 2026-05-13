@@ -20,7 +20,9 @@ public class UsuarioUpdate {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate fechaNacimiento;
+    //Si son cliente o freelancer, se mandan tambien sus complementos para actualizar
     private ClienteUpdate clienteUpdate;
+    //en caso del freelancer solo se manda su complemento para actualizar, la actualizacion de sus habilidades, se haces desde el enpoint de agregar o eliminar, que es especialemnte para eso
     private FreelancerUpdate freelancerUpdate;
 
     public int getUsuarioId() {

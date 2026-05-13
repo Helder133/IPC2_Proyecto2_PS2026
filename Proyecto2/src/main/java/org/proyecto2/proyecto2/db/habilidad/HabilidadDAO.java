@@ -22,6 +22,7 @@ public class HabilidadDAO implements CRUD<Habilidad> {
     private static final String VALID_NOMBRE = "SELECT 1 FROM habilidad WHERE nombre = ?";
     private static final String VALID_NOMBRE_UPDATE = "SELECT 1 FROM habilidad WHERE nombre = ? AND habilidad_id <> ?";
     private static final String GET_ALL_HABILIDAD_ACTIVADA = "SELECT * FROM habilidad WHERE estado = 1";
+    private static final String GET_ALL_HABILIDADES_NO_REGISTRADOS = "SELECT h.* FROM habilidad h LEFT JOIN freelancer_habilidad fh ON h.habilidad_id = fh.habilidad_id AND fh.usuario_id = ? WHERE fh.habilidad_id IS NULL AND h.estado = 1";
 
     public boolean validNombre(String nombre) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
@@ -33,11 +34,20 @@ public class HabilidadDAO implements CRUD<Habilidad> {
         }
     }
 
-    public boolean validNombreUpdate(String nombre, int usuarioId) throws SQLException {
+    public boolean validNombreUpdate(String nombre, int habilidadId) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
         try (PreparedStatement valid = connection.prepareStatement(VALID_NOMBRE_UPDATE)) {
             valid.setString(1, nombre);
-            valid.setInt(2, usuarioId);
+            valid.setInt(2, habilidadId);
+            try (ResultSet rs = valid.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    public boolean validNombre(String nombre, Connection connection) throws SQLException {
+        try (PreparedStatement valid = connection.prepareStatement(VALID_NOMBRE)) {
+            valid.setString(1, nombre);
             try (ResultSet rs = valid.executeQuery()) {
                 return rs.next();
             }
@@ -47,6 +57,14 @@ public class HabilidadDAO implements CRUD<Habilidad> {
     @Override
     public void insert(Habilidad habilidad) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
+        try (PreparedStatement insert = connection.prepareStatement(INSERT_HABILIDAD)) {
+            insert.setString(1, habilidad.getNombre());
+            insert.setString(2, habilidad.getDescripcion());
+            insert.executeUpdate();
+        }
+    }
+
+    public void insert(Habilidad habilidad, Connection connection) throws SQLException {
         try (PreparedStatement insert = connection.prepareStatement(INSERT_HABILIDAD)) {
             insert.setString(1, habilidad.getNombre());
             insert.setString(2, habilidad.getDescripcion());
@@ -114,6 +132,18 @@ public class HabilidadDAO implements CRUD<Habilidad> {
         }
     }
 
+    public List<Habilidad> getAllHabilidadesNoRegistradosEnUsuario(int usuarioId) throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        List<Habilidad> habilidades = new ArrayList<>();
+        try (PreparedStatement select = connection.prepareStatement(GET_ALL_HABILIDADES_NO_REGISTRADOS)) {
+            select.setInt(1, usuarioId);
+            try (ResultSet rs = select.executeQuery()) {
+                while (rs.next()) habilidades.add(extraerDatos(rs));
+                return habilidades;
+            }
+        }
+    }
+
     public void updateEstado(int usuarioId) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
         try (PreparedStatement update = connection.prepareStatement(UPDATE_HABILIDAD_ESTADO)) {
@@ -122,7 +152,7 @@ public class HabilidadDAO implements CRUD<Habilidad> {
         }
     }
 
-    public Habilidad extraerDatos(ResultSet rs) throws SQLException {
+    private Habilidad extraerDatos(ResultSet rs) throws SQLException {
         Habilidad habilidad = new Habilidad(
                 rs.getString("nombre"),
                 rs.getString("descripcion")

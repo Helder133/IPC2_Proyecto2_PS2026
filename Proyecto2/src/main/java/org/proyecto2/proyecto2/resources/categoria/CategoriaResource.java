@@ -29,8 +29,8 @@ public class CategoriaResource {
         try {
             String rol = (String) request.getProperty("rol");
             CategoriaService categoriaService = new CategoriaService();
-            categoriaService.insert(categoriaRequest, EnumUsuario.valueOf(rol));
-            return Response.status(Response.Status.CREATED).entity("\"mensaje\": \"Categoria creado exitosamente\"").build();
+            categoriaService.createCategoria(categoriaRequest, EnumUsuario.valueOf(rol));
+            return Response.status(Response.Status.CREATED).entity("{\"mensaje\": \"Categoria creado exitosamente\"}").build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
         } catch (EntityAlreadyExistsException e) {
@@ -111,7 +111,7 @@ public class CategoriaResource {
             String rol = (String) request.getProperty("rol");
             CategoriaService categoriaService = new CategoriaService();
             categoriaService.update(categoriaUpdate, EnumUsuario.valueOf(rol));
-            return Response.ok("\"mensaje\": \"Categoria actualizado exitosamente\"").build();
+            return Response.ok("{\"mensaje\": \"Categoria actualizado exitosamente\"}").build();
         } catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
         } catch (EntityAlreadyExistsException e) {
@@ -130,7 +130,7 @@ public class CategoriaResource {
             String rol = (String)  request.getProperty("rol");
             CategoriaService categoriaService = new CategoriaService();
             categoriaService.updateEstado(categoriaId, EnumUsuario.valueOf(rol));
-            return Response.ok("\"mensaje\": \"Estado de categoria actualizado exitosamente\"").build();
+            return Response.ok("{\"mensaje\": \"Estado de categoria actualizado exitosamente\"}").build();
         }  catch (UserDataInvalidException e) {
             return errorEjecucion(e.getMessage(), 1);
         } catch (SQLException e) {

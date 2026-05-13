@@ -1,0 +1,41 @@
+<form [formGroup]="propuestaForm" (ngSubmit)="enviar()">
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <label class="form-label small text-light opacity-75">Tu Oferta (Q)</label>
+            <input type="number" class="form-control bg-dark text-warning fw-bold border-secondary fs-5"
+                formControlName="monto" step="0.01">
+            @if (propuestaForm.get('monto')?.hasError('max') && propuestaForm.get('monto')?.touched) {
+            <small class="text-warning d-block mt-1">Supera el presupuesto máximo (Q {{ presupuestoMaximo |
+                number:'1.2-2' }}).</small>
+            }
+            @if (propuestaForm.get('monto')?.hasError('min') && propuestaForm.get('monto')?.touched) {
+            <small class="text-warning d-block mt-1">El monto debe ser mayor a 0.</small>
+            }
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label small text-light opacity-75">Tiempo de Entrega (Días)</label>
+            <input type="number" class="form-control bg-dark text-light border-secondary fs-5"
+                formControlName="tiempoEntrega">
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <label class="form-label small text-light opacity-75">Carta de Presentación / Estrategia</label>
+        <textarea class="form-control bg-dark text-light border-secondary" formControlName="descripcion" rows="6"
+            placeholder="Explícale al cliente por qué eres el ideal, tu experiencia y cómo abordarás el trabajo..."></textarea>
+        @if (propuestaForm.get('descripcion')?.invalid && propuestaForm.get('descripcion')?.touched) {
+        <small class="text-warning">La carta de presentación es obligatoria.</small>
+        }
+    </div>
+
+    <div class="d-grid pt-2">
+        <button type="submit" class="btn fw-bold text-dark btn-lg"
+            [ngClass]="propuestaActual ? 'btn-warning' : 'btn-info'" [disabled]="isLoading">
+            @if (isLoading) { <span class="spinner-border spinner-border-sm me-2 text-dark"></span> }
+            <i class="fa-solid" [ngClass]="propuestaActual ? 'fa-pen-to-square' : 'fa-paper-plane'"></i>
+            {{ propuestaActual ? 'Actualizar Propuesta' : 'Enviar Nueva Propuesta' }}
+        </button>
+    </div>
+</form>

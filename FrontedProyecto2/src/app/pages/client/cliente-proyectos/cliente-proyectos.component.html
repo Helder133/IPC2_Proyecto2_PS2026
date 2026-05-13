@@ -1,0 +1,127 @@
+<div class="container-fluid py-4">
+
+    @if (vistaActual() === 'lista') {
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <h4 class="text-white mb-0"><i class="fa-solid fa-briefcase me-2 text-info"></i>Gestión de Proyectos</h4>
+
+        <div class="d-flex gap-3">
+            <div class="input-group input-group-sm shadow-sm" style="max-width: 250px;">
+                <span class="input-group-text bg-dark border-secondary text-info"><i
+                        class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" class="form-control bg-dark text-light border-secondary"
+                    placeholder="Buscar proyecto..." (input)="buscarProyecto($event)">
+            </div>
+            <button class="btn btn-info btn-sm fw-bold text-dark px-3" (click)="cambiarVista('crear')">
+                <i class="fa-solid fa-plus me-1"></i> Publicar Nuevo
+            </button>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        @for (proy of proyectos(); track proy.proyectoId) {
+        <div class="col">
+            <app-proyecto-card-component [proyecto]="proy" [vistaRol]=enumUsuario.Cliente
+                (onEdit)="iniciarEdicion($event)" (onCancel)="cancelarProyecto($event)"
+                (onManageSkills)="iniciarGestionHabilidades($event)"
+                (onVerDetalle)="verDetalleProyecto($event)">
+            </app-proyecto-card-component>
+        </div>
+        } @empty {
+        <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-folder-open fs-1 text-light opacity-25 mb-3 d-block"></i>
+            <p class="text-light opacity-50">No has publicado ningún proyecto. ¡Crea el primero!</p>
+        </div>
+        }
+    </div>
+    }
+
+    @if (vistaActual() === 'crear' || vistaActual() === 'editar') {
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-lg-10">
+
+            <div class="d-flex align-items-center mb-4">
+                <button class="btn btn-outline-light btn-sm me-3" (click)="cambiarVista('lista')">
+                    <i class="fa-solid fa-arrow-left"></i> Volver
+                </button>
+                <h4 class="text-white mb-0">
+                    {{ vistaActual() === 'crear' ? 'Publicar Nuevo Proyecto' : 'Editar Proyecto' }}
+                </h4>
+            </div>
+
+            <app-proyecto-form-component [categorias]="categorias()" [habilidadesDisponibles]="habilidadesDisponibles()"
+                [isUpdateMode]="vistaActual() === 'editar'" [proyectoAEditar]="proyectoAEditar()"
+                [isLoading]="isLoading()" (formSubmit)="procesarFormulario($event)" (onCancel)="cambiarVista('lista')">
+            </app-proyecto-form-component>
+
+        </div>
+    </div>
+    }
+
+    @if (vistaActual() === 'habilidades') {
+    <div class="row justify-content-center">
+        <div class="col-xl-6 col-lg-8">
+
+            <div class="d-flex align-items-center mb-4">
+                <button class="btn btn-outline-light btn-sm me-3" (click)="cambiarVista('lista')"
+                    [disabled]="isLoading()">
+                    <i class="fa-solid fa-arrow-left"></i> Volver
+                </button>
+                <h4 class="text-white mb-0">Requerimientos Técnicos</h4>
+            </div>
+
+            <div class="card bg-secondary text-light shadow-sm border-0">
+                <div class="card-header border-bottom border-dark py-3">
+                    <h6 class="mb-0 text-info fw-bold">{{ proyectoAEditar()?.titulo }}</h6>
+                </div>
+
+                <div class="card-body p-4">
+                    @if (errorMessage()) { <div class="alert alert-danger py-2">{{ errorMessage() }}</div> }
+
+                    <h6 class="text-white mb-3">Habilidades Actuales</h6>
+                    <div class="d-flex flex-wrap gap-2 mb-5">
+                        @for (hab of proyectoAEditar()?.habilidadResponses; track hab.habilidadId) {
+                        <div class="badge bg-dark border border-info d-flex align-items-center p-2 px-3 rounded-pill">
+                            <span class="me-2 text-info">{{ hab.nombre }}</span>
+                            <button class="btn btn-link text-danger p-0 lh-1"
+                                (click)="quitarHabilidadDeProyecto(hab.habilidadId)"
+                                [disabled]="isLoading() || proyectoAEditar()!.habilidadResponses.length === 1"
+                                title="Quitar">
+                                <i class="fa-solid fa-circle-xmark"></i>
+                            </button>
+                        </div>
+                        }
+                    </div>
+
+                    <div class="border-top border-dark pt-4">
+                        <h6 class="text-white mb-3">Agregar Nueva Habilidad</h6>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-info dropdown-toggle w-100" type="button"
+                                data-bs-toggle="dropdown" [disabled]="isLoading()">
+                                @if (isLoading()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                                Seleccionar habilidad para agregar al proyecto...
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark w-100 shadow-lg border-secondary"
+                                style="max-height: 250px; overflow-y: auto;">
+                                @for (hab of getHabilidadesParaAgregar(); track hab.habilidadId) {
+                                <li>
+                                    <button class="dropdown-item py-2"
+                                        (click)="agregarHabilidadAProyecto(hab.habilidadId)">
+                                        <span class="fw-bold text-info">{{ hab.nombre }}</span>
+                                    </button>
+                                </li>
+                                } @empty {
+                                <li class="p-3 text-center text-light opacity-75 small">El proyecto ya cuenta con todas
+                                    las habilidades disponibles.</li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    }
+
+</div>

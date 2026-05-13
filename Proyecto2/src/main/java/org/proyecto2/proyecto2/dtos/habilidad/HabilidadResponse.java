@@ -2,8 +2,10 @@ package org.proyecto2.proyecto2.dtos.habilidad;
 
 import org.proyecto2.proyecto2.models.habilidad.Habilidad;
 
-public class HabilidadResponse extends HabilidadRequest {
+public class HabilidadResponse {
     private int habilidadId;
+    private String nombre;
+    private String descripcion;
     private boolean estado;
 
     public HabilidadResponse(Habilidad habilidad) {
@@ -19,6 +21,22 @@ public class HabilidadResponse extends HabilidadRequest {
 
     public void setHabilidadId(int habilidadId) {
         this.habilidadId = habilidadId;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public boolean isEstado() {

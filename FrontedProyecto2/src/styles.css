@@ -1,0 +1,21 @@
+.badge {
+    font-size: 0.95rem;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(13, 202, 240, 0.1);
+}
+
+/* --- FIX PARA PLACEHOLDERS EN MODO OSCURO --- */
+.bg-dark::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+    /* Blanco al 60% de opacidad */
+    opacity: 1 !important;
+    /* Firefox a veces baja la opacidad por defecto, esto lo fuerza */
+}
+
+/* Si tienes textareas oscuros, también aplicamos la misma regla */
+textarea.bg-dark::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+    opacity: 1 !important;
+}

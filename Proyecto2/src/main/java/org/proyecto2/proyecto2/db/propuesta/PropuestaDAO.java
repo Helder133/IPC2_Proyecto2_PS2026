@@ -5,6 +5,7 @@ import org.proyecto2.proyecto2.db.config.DBConnection;
 import org.proyecto2.proyecto2.models.propuesta.EnumPropuesta;
 import org.proyecto2.proyecto2.models.propuesta.Propuesta;
 import org.proyecto2.proyecto2.models.propuesta.PropuestaDetalle;
+import org.proyecto2.proyecto2.models.propuesta.PropuestaHistorial;
 
 import java.sql.*;
 import java.util.List;
@@ -17,7 +18,7 @@ public class PropuestaDAO implements CRUD<Propuesta> {
     private static final String EXISTS_PROPUESTA = "SELECT 1 FROM propuesta WHERE propuesta_id = ? AND usuario_id = ? AND estado <> 'RETIRADO'";
     private static final String EXISTS_PROPUESTA_FREELANCER = "SELECT 1 FROM propuesta WHERE proyecto_id = ? AND usuario_id = ? AND estado <> 'RETIRADO'";
     private static final String GET_BY_ID_PROPUESTA = "SELECT * FROM propuesta WHERE propuesta_id = ?";
-    private static final String GET_ALL_PROPUESTA_FOR_A_PROYECTO = "SELECT p.propuesta_id, p.proyecto_id, p.monto, p.tiempo_entrega, p.descripcion, p.estado, p.fecha_creacion, u.usuario_id, u.nombre_completo, u.user_name, COALESCE(cal.promedio_calificacion, 0) AS promedio_calificacion, COALESCE(cal.total_calificaciones, 0) AS total_calificaciones FROM propuesta p INNER JOIN usuario u ON p.usuario_id = u.usuario_id LEFT JOIN (SELECT p2.usuario_id, COUNT(c.calificacion) AS total_calificaciones, AVG(c.calificacion) AS promedio_calificacion FROM propuesta p2 INNER JOIN contrato c ON p2.propuesta_id = c.propuesta_id GROUP BY p2.usuario_id) cal ON p.usuario_id = cal.usuario_id JOIN proyecto p3 on p.proyecto_id = p3.proyecto_id WHERE p.proyecto_id = ? AND p3.usuario_id = ?;";
+    private static final String GET_ALL_PROPUESTA_FOR_A_PROYECTO = "SELECT p.propuesta_id, p.proyecto_id, p.monto, p.tiempo_entrega, p.descripcion, p.estado, p.fecha_creacion, u.usuario_id, u.nombre_completo, u.user_name, COALESCE(cal.promedio_calificacion, 0) AS promedio_calificacion, COALESCE(cal.total_calificaciones, 0) AS total_calificaciones FROM propuesta p INNER JOIN usuario u ON p.usuario_id = u.usuario_id LEFT JOIN (SELECT p2.usuario_id, COUNT(c.calificacion) AS total_calificaciones, AVG(c.calificacion) AS promedio_calificacion FROM propuesta p2 INNER JOIN contrato c ON p2.propuesta_id = c.propuesta_id GROUP BY p2.usuario_id) cal ON p.usuario_id = cal.usuario_id JOIN proyecto p3 on p.proyecto_id = p3.proyecto_id WHERE p.proyecto_id = ? AND p3.usuario_id = ?";
     private static final String GET_ALL_PROPUESTA_FROM_A_FREELANCER = "SELECT * FROM propuesta WHERE usuario_id = ? AND proyecto_id = ?";
 
     public boolean existsPropuesta(int propuestaId, int usuarioId) throws SQLException {
@@ -154,6 +155,41 @@ public class PropuestaDAO implements CRUD<Propuesta> {
                 return propuestas;
             }
         }
+    }
+
+    public List<PropuestaHistorial> getHistorialPropuestasFreelancer(int usuarioId, String estadoFiltro) throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        StringBuilder query = new StringBuilder("SELECT p.*, pr.titulo AS proyecto_titulo FROM propuesta p INNER JOIN proyecto pr ON p.proyecto_id = pr.proyecto_id WHERE p.usuario_id = ?");
+        boolean tieneFiltro = estadoFiltro != null && !estadoFiltro.equalsIgnoreCase("TODAS");
+        if (tieneFiltro) {
+            query.append(" AND p.estado = ? ");
+        }
+        query.append(" ORDER BY p.fecha_creacion DESC");
+        try (PreparedStatement select = connection.prepareStatement(query.toString())) {
+            select.setInt(1, usuarioId);
+            if (tieneFiltro) {
+                select.setString(2, estadoFiltro);
+            }
+            try (ResultSet rs = select.executeQuery()) {
+                List<PropuestaHistorial> propuestas = new java.util.ArrayList<>();
+                while (rs.next()) {
+                    propuestas.add(extraerDatosHistorial(rs));
+                }
+                return propuestas;
+            }
+        }
+    }
+    private PropuestaHistorial extraerDatosHistorial(ResultSet rs) throws SQLException {
+        return new PropuestaHistorial(
+                rs.getInt("propuesta_id"),
+                rs.getInt("proyecto_id"),
+                rs.getString("proyecto_titulo"), // 🔥 Obtenido del JOIN
+                rs.getDouble("monto"),
+                rs.getInt("tiempo_entrega"),
+                rs.getString("descripcion"),
+                EnumPropuesta.valueOf(rs.getString("estado")),
+                rs.getDate("fecha_creacion").toLocalDate()
+        );
     }
 
     @Override

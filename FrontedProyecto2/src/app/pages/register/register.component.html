@@ -1,0 +1,34 @@
+<div class="container-fluid bg-dark text-light min-vh-100 py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+
+            <div class="card bg-secondary text-light shadow-lg" style="border-radius: 15px;">
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold">Crea tu Cuenta</h2>
+                        <p class="text-light opacity-75">Únete a nuestra plataforma</p>
+                    </div>
+
+                    @if (errorMessage()) {
+                    <div class="alert alert-danger"><i class="fa-solid fa-triangle-exclamation me-2"></i> {{
+                        errorMessage() }}</div>
+                    }
+                    @if (successMessage()) {
+                    <div class="alert alert-success"><i class="fa-solid fa-check me-2"></i> {{ successMessage() }}</div>
+                    }
+
+                    <app-usuario-form-component [isLoading]="isLoading()" (formSubmit)="onRegister($event)">
+                    </app-usuario-form-component>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-0">¿Ya tienes cuenta? <a routerLink="/login"
+                                class="text-info fw-bold text-decoration-none">Inicia sesión aquí</a></p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

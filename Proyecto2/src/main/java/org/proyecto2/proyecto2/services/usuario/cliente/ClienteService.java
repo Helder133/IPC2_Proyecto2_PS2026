@@ -12,8 +12,9 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 public class ClienteService {
-    public void insertComplemento(ClienteRequest clienteRequest, EnumUsuario rol) throws SQLException, UserDataInvalidException {
+    public void insertComplemento(ClienteRequest clienteRequest, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException {
         Cliente cliente = new Cliente(clienteRequest);
+        cliente.setUsuarioId(usuarioId);
         if (!EnumUsuario.Cliente.equals(rol))
             throw new UserDataInvalidException(String.format("Solo un usuario con el rol: %s, puede agregar un complemento de cliente.", EnumUsuario.Cliente));
         if (!cliente.isValid()) throw new UserDataInvalidException("Descripción y sector son requeridos");
