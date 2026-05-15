@@ -3,6 +3,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { PropuestaCardComponent } from '../../../components/propuesta-card/propuesta-card.component';
 import { PropuestaService } from '../../../services/propuesta/propuesta.service';
 import { Router } from '@angular/router';
+import { ContratoService } from '../../../services/contrato/contrato.service';
 
 @Component({
   selector: 'app-freelancer-propuestas.component',
@@ -12,6 +13,7 @@ import { Router } from '@angular/router';
 export class FreelancerPropuestasComponent implements OnInit {
   private propuestaService = inject(PropuestaService);
   private router = inject(Router);
+  private contratoService = inject(ContratoService);
 
   propuestas = signal<any[]>([]);
   filtroActual = signal<string>('TODAS');
@@ -29,7 +31,7 @@ export class FreelancerPropuestasComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => this.isLoading.set(false)
-      });
+    });
   }
 
   cambiarFiltro(nuevoFiltro: string) {
@@ -39,5 +41,19 @@ export class FreelancerPropuestasComponent implements OnInit {
 
   verProyecto(proyectoId: number) {
     this.router.navigate(['/freelancer/buscar-proyectos'], { queryParams: { id: proyectoId } });
+  }
+
+  irAlContrato(propuestaId: number) {
+    this.isLoading.set(true);
+    this.contratoService.getContratoByPropuestaId(propuestaId).subscribe({
+      next: (contrato) => {
+        this.router.navigate(['/freelancer/contrato-detalle'], { queryParams: { id: contrato.contratoId } });
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.router.navigate(['/freelancer/contratos']);
+        this.isLoading.set(false);
+      }
+    });
   }
 }

@@ -21,6 +21,7 @@ public class ContratoResponse {
     private LocalDate fechaFinalizacion;
     private String comentario;
     private int calificacion;
+    private String tituloProyecto;
 
     public ContratoResponse(Contrato contrato) {
         this.contratoId = contrato.getContratoId();
@@ -31,6 +32,7 @@ public class ContratoResponse {
         this.fechaFinalizacion = contrato.getFechaFinalizacion();
         this.comentario = contrato.getComentario();
         this.calificacion = contrato.getCalificacion();
+        this.tituloProyecto = contrato.getTituloProyecto();
     }
 
     public int getContratoId() {
@@ -95,5 +97,13 @@ public class ContratoResponse {
 
     public void setCalificacion(int calificacion) {
         this.calificacion = calificacion;
+    }
+
+    public String getTituloProyecto() {
+        return tituloProyecto;
+    }
+
+    public void setTituloProyecto(String tituloProyecto) {
+        this.tituloProyecto = tituloProyecto;
     }
 }

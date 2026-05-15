@@ -1,0 +1,44 @@
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="text-white mb-0">
+            <i class="fa-solid fa-handshake me-2 text-info"></i>Freelancers Contratos
+        </h4>
+    </div>
+
+    <div class="d-flex gap-2 mb-4 border-bottom border-secondary pb-3">
+        <button class="btn px-4 rounded-pill transition"
+            [ngClass]="filtroActual() === 'ACTIVOS' ? 'btn-info text-dark fw-bold' : 'btn-outline-light'"
+            (click)="cambiarFiltro('ACTIVOS')">
+            Activos (En Progreso)
+        </button>
+
+        <button class="btn px-4 rounded-pill transition"
+            [ngClass]="filtroActual() === 'HISTORIAL' ? 'btn-info text-dark fw-bold' : 'btn-outline-light'"
+            (click)="cambiarFiltro('HISTORIAL')">
+            Historial (Finalizados/Cancelados)
+        </button>
+    </div>
+
+    @if (isLoading()) {
+    <div class="text-center py-5 text-info">
+        <span class="spinner-border"></span>
+        <p class="mt-2">Cargando tus contratos...</p>
+    </div>
+    } @else {
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 align-items-stretch">
+        @for (contrato of contratosFiltrados(); track contrato.contratoId) {
+        <div class="col d-flex flex-column">
+            <app-contrato-card-component [contrato]="contrato" (onVerDetalle)="abrirEspacioTrabajo($event)" class="h-100 d-block">
+            </app-contrato-card-component>
+        </div>
+        } @empty {
+        <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-folder-open fs-1 text-light opacity-25 mb-3 d-block"></i>
+            <p class="text-light opacity-50">
+                {{ filtroActual() === 'ACTIVOS' ? 'No tienes contratos activos en este momento.' : 'No tienes contratos en tu historial.' }}
+            </p>
+        </div>
+        }
+    </div>
+    }
+</div>

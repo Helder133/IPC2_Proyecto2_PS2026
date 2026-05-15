@@ -1,0 +1,80 @@
+<div class="card bg-secondary text-light shadow-sm border-0 h-100"
+    [ngClass]="{'border-info border': contrato.estado === enumContrato.Activo}">
+    <div class="card-body d-flex flex-column">
+
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="flex-grow-1 me-2">
+                <h6 class="fw-bold text-info mb-1 text-wrap">{{ contrato.tituloProyecto }}</h6>
+                <small class="text-light opacity-50">Contrato #{{ contrato.contratoId }} | Propuesta #{{
+                    contrato.propuestaId }}</small>
+            </div>
+
+            <span class="badge shadow-sm" [ngClass]="{
+                'bg-info text-dark': contrato.estado === enumContrato.Activo,
+                'bg-success': contrato.estado === enumContrato.Finalizado,
+                'bg-danger': contrato.estado === enumContrato.Cancelado
+            }">
+                {{ contrato.estado }}
+            </span>
+        </div>
+
+        @if (contrato.estado === enumContrato.Cancelado && contrato.motivoCancelacion) {
+        <div class="mb-3 p-2 bg-dark border-start border-danger border-3 rounded small">
+            <strong class="text-danger"><i class="fa-solid fa-triangle-exclamation me-1"></i>Motivo de
+                Cancelación:</strong><br>
+            <span class="text-light opacity-75">{{ contrato.motivoCancelacion }}</span>
+        </div>
+        }
+
+        @if (contrato.estado === enumContrato.Finalizado) {
+        <div class="mb-3 p-2 bg-dark border-start border-success border-3 rounded small">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <strong class="text-success"><i class="fa-solid fa-check-double me-1"></i>Feedback del Cliente:</strong>
+                @if (contrato.calificacion) {
+                <span class="text-warning fw-bold">
+                    <i class="fa-solid fa-star"></i> {{ contrato.calificacion }}
+                </span>
+                }
+            </div>
+            @if (contrato.comentario) {
+            <span class="text-light opacity-75 fst-italic">"{{ contrato.comentario }}"</span>
+            } @else {
+            <span class="text-light opacity-50 fst-italic">Sin comentarios.</span>
+            }
+        </div>
+        }
+
+        <div class="d-flex justify-content-between align-items-end border-top border-dark pt-3 mt-auto">
+
+            <div class="d-flex gap-3">
+                <div>
+                    <div class="small text-light opacity-50 lh-1">Inicio</div>
+                    <div class="text-white fw-bold small">{{ contrato.fechaCreacion }}</div>
+                </div>
+
+                @if (contrato.fechaFinalizacion) {
+                <div class="border-start border-dark ps-3">
+                    <div class="small text-light opacity-50 lh-1">Fin</div>
+                    <div class="text-white fw-bold small">{{ contrato.fechaFinalizacion }}</div>
+                </div>
+                }
+            </div>
+
+            <div class="text-end">
+                <button class="btn btn-sm fw-bold"
+                    [ngClass]="contrato.estado === enumContrato.Activo ? 'btn-info text-dark' : 'btn-outline-light'"
+                    (click)="onVerDetalle.emit(contrato.contratoId)">
+
+                    @if (contrato.estado === enumContrato.Activo) {
+                    <i class="fa-solid fa-folder-open me-1"></i> Espacio de Trabajo
+                    } @else {
+                    <i class="fa-solid fa-clock-rotate-left me-1"></i> Ver Historial
+                    }
+
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+</div>

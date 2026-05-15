@@ -14,6 +14,8 @@ public class Nueva_h_c {
     private EnumNueva_h_cTipo tipo;
     private EnumNueva_h_cEstado estado;
     private LocalDate fechaCreacion;
+    private String nombreCompleto;
+    private String userName;
 
     public Nueva_h_c(int solicitudId, int usuarioId, String nombre, String descripcion, EnumNueva_h_cTipo tipo, EnumNueva_h_cEstado estado, LocalDate fechaCreacion) {
         this.solicitudId = solicitudId;
@@ -109,5 +111,21 @@ public class Nueva_h_c {
 
     public void setFechaCreacion(LocalDate fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
+    }
+
+    public String getNombreCompleto() {
+        return nombreCompleto;
+    }
+
+    public void setNombreCompleto(String nombreCompleto) {
+        this.nombreCompleto = nombreCompleto;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

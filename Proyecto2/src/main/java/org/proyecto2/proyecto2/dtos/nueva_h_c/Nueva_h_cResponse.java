@@ -19,6 +19,8 @@ public class Nueva_h_cResponse {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate fechaCreacion;
+    private String nombreCompleto;
+    private String userName;
 
     public Nueva_h_cResponse(Nueva_h_c nueva_h_c) {
         this.solicitudId = nueva_h_c.getSolicitudId();
@@ -28,6 +30,9 @@ public class Nueva_h_cResponse {
         this.tipo = nueva_h_c.getTipo();
         this.estado = nueva_h_c.getEstado();
         this.fechaCreacion = nueva_h_c.getFechaCreacion();
+        this.nombreCompleto = nueva_h_c.getNombreCompleto();
+        this.userName = nueva_h_c.getUserName();
+
     }
 
     public int getSolicitudId() {
@@ -84,5 +89,21 @@ public class Nueva_h_cResponse {
 
     public void setFechaCreacion(LocalDate fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
+    }
+
+    public String getNombreCompleto() {
+        return nombreCompleto;
+    }
+
+    public void setNombreCompleto(String nombreCompleto) {
+        this.nombreCompleto = nombreCompleto;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

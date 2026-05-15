@@ -20,8 +20,13 @@
                     <a class="nav-link" routerLink="/cliente/proyectos" routerLinkActive="active">Mis Proyectos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" routerLink="/cliente/freelancers" routerLinkActive="active">Buscar
-                        Freelancers</a>
+                    <a class="nav-link transition" routerLink="/cliente/contratos"
+                        routerLinkActive="active text-info fw-bold">
+                        Freelancers Contratados
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="/solicitudes" routerLinkActive="active">Solicitudes</a>
                 </li>
                 }
 
@@ -41,6 +46,13 @@
                     <a class="nav-link px-3" routerLink="/freelancer/propuestas" routerLinkActive="active-link">Mis
                         Propuestas</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link px-3" routerLink="/freelancer/contratos" routerLinkActive="active-link">Mis
+                        Contratos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="/solicitudes" routerLinkActive="active">Solicitudes</a>
+                </li>
                 }
 
                 @if (rolUsuario() === enumUsuario.Administrador) {
@@ -55,6 +67,11 @@
                 <li class="nav-item">
                     <a class="nav-link" routerLink="/admin/usuarios" routerLinkActive="active">Usuarios</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" routerLink="/admin/solicitudes" routerLinkActive="active">Solicitudes</a>
+                </li>
+
                 }
 
                 <li class="nav-item">

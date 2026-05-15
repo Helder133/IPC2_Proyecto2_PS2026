@@ -96,7 +96,7 @@ public class EntregaResource {
     }
 
     @PUT
-    @Path("/actulizar/rechazar")
+    @Path("/actualizar/rechazar")
     @Secured
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)

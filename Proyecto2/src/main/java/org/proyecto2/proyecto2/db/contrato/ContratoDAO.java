@@ -13,9 +13,10 @@ public class ContratoDAO {
     private static final String INSERT_CONTRATO = "INSERT INTO contrato (propuesta_id, fecha_creacion) VALUES (?, ?)";
     private static final String UPDATE_ESTADO_FINALIZACION = "UPDATE contrato SET estado = 'FINALIZADO', fecha_finalizacion = ?, comentario = ?, calificacion = ? WHERE contrato_id = ?";
     private static final String UPDATE_ESTADO_CANCELACION = "UPDATE contrato SET estado = 'CANCELADO', motivo_cancelacion = ?, fecha_finalizacion = ? WHERE contrato_id = ?";
-    private static final String GET_BY_ID_CONTRATO = "SELECT * FROM contrato WHERE contrato_id = ?";
-    private static final String GET_ALL_CONTRACTS_FROM_A_FREELANCER = "SELECT c.* FROM contrato c JOIN propuesta p on c.propuesta_id = p.propuesta_id WHERE p.usuario_id = ?";
-    private static final String GET_ALL_CONTRACTS_FROM_A_CLIENT = "SELECT c.* FROM contrato c JOIN propuesta p on c.propuesta_id = p.propuesta_id JOIN proyecto pr on p.proyecto_id = pr.proyecto_id WHERE pr.usuario_id = ?";
+    private static final String GET_BY_ID_CONTRATO = "SELECT c.*, pr.titulo FROM contrato c JOIN propuesta p on c.propuesta_id = p.propuesta_id JOIN proyecto pr on p.proyecto_id = pr.proyecto_id WHERE c.contrato_id = ?";
+    private static final String GET_ALL_CONTRACTS_FROM_A_FREELANCER = "SELECT c.*, pr.titulo FROM contrato c JOIN propuesta p on c.propuesta_id = p.propuesta_id JOIN proyecto pr ON p.proyecto_id = pr.proyecto_id WHERE p.usuario_id = ?";
+    private static final String GET_ALL_CONTRACTS_FROM_A_CLIENT = "SELECT c.*, pr.titulo FROM contrato c JOIN propuesta p on c.propuesta_id = p.propuesta_id JOIN proyecto pr on p.proyecto_id = pr.proyecto_id WHERE pr.usuario_id = ?";
+    private static final String GET_CONTRATO_BY_PROPUESTA_ID = "SELECT c.*, pr.titulo FROM contrato c JOIN propuesta p on c.propuesta_id = p.propuesta_id JOIN proyecto pr on p.proyecto_id = pr.proyecto_id WHERE c.propuesta_id  = ?";
     private static final String EXISTS_CONTRACTS = "SELECT 1 FROM contrato WHERE propuesta_id = ?";
     private static final String EXISTS_CONTRACT_FROM_A_CLIENT = "SELECT pr.proyecto_id FROM contrato c JOIN propuesta p on c.propuesta_id = p.propuesta_id JOIN proyecto pr on p.proyecto_id = pr.proyecto_id WHERE pr.usuario_id = ? AND c.contrato_id = ?";
 
@@ -113,6 +114,17 @@ public class ContratoDAO {
         }
     }
 
+    public Optional<Contrato> getContratoByPropuestaId(int propuestaId) throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(GET_CONTRATO_BY_PROPUESTA_ID)) {
+            preparedStatement.setInt(1, propuestaId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) return Optional.of(extraerDato(resultSet));
+                return Optional.empty();
+            }
+        }
+    }
+
     public Optional<Contrato> getById(int id, Connection connection) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement(GET_BY_ID_CONTRATO)) {
             preparedStatement.setInt(1, id);
@@ -148,7 +160,7 @@ public class ContratoDAO {
     }
 
     private Contrato extraerDato(ResultSet resultSet) throws SQLException {
-        return new Contrato(
+        Contrato contrato = new Contrato(
                 resultSet.getInt("contrato_id"),
                 resultSet.getInt("propuesta_id"),
                 EnumContrato.valueOf(resultSet.getString("estado")),
@@ -158,5 +170,7 @@ public class ContratoDAO {
                 resultSet.getString("comentario"),
                 resultSet.getInt("calificacion")
         );
+        contrato.setTituloProyecto(resultSet.getString("titulo"));
+        return contrato;
     }
 }

@@ -1,0 +1,81 @@
+<div class="container-fluid py-4">
+
+    <h4 class="text-white mb-4">
+        <i class="fa-solid fa-code-pull-request text-info me-2"></i>
+        Mis Solicitudes de {{ nombreCatalogoUI }}s
+    </h4>
+
+    @if (errorMessage()) { <div class="alert alert-danger border-0 shadow-sm mb-4">{{ errorMessage() }}</div> }
+    @if (successMessage()) { <div class="alert alert-success border-0 shadow-sm mb-4">{{ successMessage() }}</div> }
+
+    <div class="row g-4">
+
+        <div class="col-xl-7 col-lg-6">
+
+            @if (isLoading()) {
+            <div class="text-center py-5 text-info"><span class="spinner-border"></span></div>
+            } @else if (solicitudes().length === 0) {
+            <div class="text-center py-5 bg-dark rounded border border-secondary">
+                <i class="fa-solid fa-box-open fs-2 text-light opacity-25 mb-3"></i>
+                <p class="text-light opacity-50">No has solicitado ninguna {{ nombreCatalogoUI }} nueva.</p>
+            </div>
+            } @else {
+            <div class="row row-cols-1 row-cols-md-2 g-3">
+                @for (sol of solicitudes(); track sol.solicitudId) {
+                <div class="col position-relative">
+
+                    <span class="badge position-absolute top-0 end-0 m-3 shadow-sm z-1" [ngClass]="{
+                      'bg-info text-dark': sol.estado === enumEstado.Pendiente,
+                      'bg-success': sol.estado === enumEstado.Aceptada,
+                      'bg-danger': sol.estado === enumEstado.Rechazada
+                    }">
+                        {{ sol.estado }}
+                    </span>
+
+                    <app-solicitud-card-component [solicitud]="sol" vistaRol="usuario"
+                        (onEditar)="iniciarEdicion($event)">
+                    </app-solicitud-card-component>
+
+                    @if (sol.estado === enumEstado.Pendiente) {
+                    <button class="btn btn-warning btn-sm position-absolute bottom-0 end-0 m-3 z-1 shadow"
+                        (click)="iniciarEdicion(sol)">
+                        <i class="fa-solid fa-pen"></i> Editar
+                    </button>
+                    }
+
+                </div>
+                }
+            </div>
+            }
+        </div>
+
+        <div class="col-xl-5 col-lg-6">
+            <div class="card bg-secondary text-light shadow-sm border-0 sticky-top" style="top: 20px;">
+                <div
+                    class="card-header border-bottom border-dark py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        {{ solicitudEditando() ? 'Editar Solicitud' : 'Sugerir Nueva ' + nombreCatalogoUI }}
+                    </h5>
+                    @if (solicitudEditando()) {
+                    <button class="btn btn-sm btn-outline-light" (click)="cancelarEdicion()">
+                        <i class="fa-solid fa-xmark"></i> Cancelar
+                    </button>
+                    }
+                </div>
+                <div class="card-body p-4">
+
+                    <div class="alert alert-dark border-info border-start border-3 small mb-4">
+                        Los administradores revisarán tu solicitud. Si es <strong>aceptada</strong>, la {{
+                        nombreCatalogoUI }} estará disponible para todos en la plataforma.
+                    </div>
+
+                    <app-solicitud-form-component [solicitudEditando]="solicitudEditando()" [isSubmitting]="isSubmitting()"
+                        [tipoCatalogo]="tipoCatalogo" (formSubmit)="procesarFormulario($event)">
+                    </app-solicitud-form-component>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

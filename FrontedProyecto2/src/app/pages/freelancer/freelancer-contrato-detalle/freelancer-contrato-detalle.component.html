@@ -1,0 +1,88 @@
+<div class="container-fluid py-4">
+
+    <div class="d-flex align-items-center mb-4">
+        <button class="btn btn-outline-light btn-sm me-3" (click)="volver()" [disabled]="isLoading()">
+            <i class="fa-solid fa-arrow-left"></i> Mis Contratos
+        </button>
+        <h4 class="text-white mb-0">Espacio de Trabajo</h4>
+    </div>
+
+    @if (errorMessage()) { <div class="alert alert-danger shadow-sm border-0 mb-4">{{ errorMessage() }}</div> }
+    @if (successMessage()) { <div class="alert alert-success shadow-sm border-0 mb-4">{{ successMessage() }}</div> }
+
+    @if (isLoading()) {
+    <div class="text-center py-5 text-info">
+        <span class="spinner-border spinner-border-lg"></span>
+        <p class="mt-2">Cargando detalles...</p>
+    </div>
+    } @else if (contrato()) {
+
+    <div class="row g-4">
+
+        <div class="col-xl-5 col-lg-6">
+
+            <div class="card bg-dark border-secondary text-light shadow-sm mb-4 border-start border-info border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <h5 class="text-info fw-bold mb-0">{{ contrato()!.tituloProyecto }}</h5>
+                        <span class="badge bg-warning text-dark">{{ contrato()!.estado }}</span>
+                    </div>
+                    <div class="d-flex gap-3 text-light opacity-75 small">
+                        <span><i class="fa-solid fa-file-signature me-1"></i> Contrato #{{ contrato()!.contratoId
+                            }}</span>
+                        <span><i class="fa-solid fa-calendar-day me-1"></i> Creado: {{ contrato()!.fechaCreacion
+                            }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="text-white mb-3 border-bottom border-secondary pb-2">Historial de Entregas</h6>
+
+            @if (entregas().length === 0) {
+            <div class="text-center py-4 bg-secondary rounded border border-dark">
+                <i class="fa-solid fa-box-open fs-2 text-light opacity-25 mb-2 d-block"></i>
+                <p class="small text-light opacity-50 mb-0">Aún no has realizado ninguna entrega.</p>
+            </div>
+            }
+
+            <div class="d-flex flex-column gap-3">
+                @for (ent of entregas(); track ent.entregaId) {
+                <app-entrega-card-component [entrega]="ent" vistaRol="freelancer">
+                </app-entrega-card-component>
+                }
+            </div>
+
+        </div>
+
+        <div class="col-xl-7 col-lg-6">
+            <div class="card bg-secondary text-light shadow-sm border-0 sticky-top" style="top: 20px;">
+                <div class="card-header border-bottom border-dark py-3">
+                    <h5 class="mb-0 text-white">
+                        <i class="fa-solid" [ngClass]="entregaPendiente() ? 'fa-pen' : 'fa-cloud-arrow-up'"></i>
+                        {{ entregaPendiente() ? 'Actualizar Entrega Pendiente' : 'Subir Nueva Entrega' }}
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+
+                    @if (contrato()!.estado !== enumContrato.Activo) {
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-lock fs-1 text-light opacity-50 mb-3"></i>
+                        <h5 class="text-white">Contrato {{ contrato()!.estado }}</h5>
+                        <p class="text-light opacity-75">Ya no es posible realizar entregas para este contrato.</p>
+                    </div>
+                    } @else {
+
+                    <app-entrega-form-component [entregaPendiente]="entregaPendiente()" [isSubmitting]="isSubmitting()"
+                        (formSubmit)="procesarFormulario($event)">
+                    </app-entrega-form-component>
+
+                    }
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    }
+
+</div>

@@ -1,0 +1,58 @@
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="text-white mb-0">
+            <i class="fa-solid fa-clipboard-check text-info me-2"></i>Revisión de Catálogos
+        </h4>
+    </div>
+
+    @if (errorMessage()) { <div class="alert alert-danger shadow-sm border-0 mb-4">{{ errorMessage() }}</div> }
+    @if (successMessage()) { <div class="alert alert-success shadow-sm border-0 mb-4">{{ successMessage() }}</div> }
+
+    <div class="d-flex gap-2 mb-4 border-bottom border-secondary pb-3">
+        <button class="btn px-4 rounded-pill transition"
+            [ngClass]="filtroActual() === 'PENDIENTES' ? 'btn-info text-dark fw-bold' : 'btn-outline-light'"
+            (click)="cambiarFiltro('PENDIENTES')">
+            Nuevas Solicitudes (Pendientes)
+        </button>
+
+        <button class="btn px-4 rounded-pill transition"
+            [ngClass]="filtroActual() === 'HISTORIAL' ? 'btn-info text-dark fw-bold' : 'btn-outline-light'"
+            (click)="cambiarFiltro('HISTORIAL')">
+            Historial (Aprobadas / Rechazadas)
+        </button>
+    </div>
+
+    @if (isLoading() || isProcessing()) {
+    <div class="text-center py-5 text-info">
+        <span class="spinner-border spinner-border-lg"></span>
+        <p class="mt-2">{{ isProcessing() ? 'Procesando decisión...' : 'Cargando bandeja de entrada...' }}</p>
+    </div>
+    } @else {
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 align-items-stretch">
+
+        @for (sol of solicitudesFiltradas(); track sol.solicitudId) {
+        <div class="col d-flex flex-column">
+
+            <app-solicitud-card-component [solicitud]="sol" vistaRol="admin" (onAceptar)="aprobarSolicitud($event)"
+                (onRechazar)="rechazarSolicitud($event)" class="h-100 d-block">
+            </app-solicitud-card-component>
+
+        </div>
+        } @empty {
+
+        <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-inbox fs-1 text-light opacity-25 mb-3 d-block"></i>
+            <p class="text-light opacity-50">
+                {{ filtroActual() === 'PENDIENTES'
+                ? '¡Todo al día! No hay solicitudes nuevas por revisar.'
+                : 'Aún no hay historial de solicitudes procesadas.' }}
+            </p>
+        </div>
+
+        }
+    </div>
+    }
+
+</div>

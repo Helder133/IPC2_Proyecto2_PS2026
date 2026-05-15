@@ -116,6 +116,7 @@ public class PropuestaService {
             ContratoService contratoService = new ContratoService();
             contratoService.insertContrato(contrato, connection);
             Propuesta propuesta = getPropuestaById(propuestaId, connection);
+            propuestaDAO.rechazarDemasPropuestas(propuesta.getProyectoId(), propuestaId, connection);
             ProyectoService proyectoService = new ProyectoService();
             proyectoService.updateProyectoEstadoEnProgreso(propuesta.getProyectoId(), connection);
             CarteraService carteraService = new CarteraService();
@@ -161,5 +162,10 @@ public class PropuestaService {
             throw new UserDataInvalidException("Solo los freelancers pueden ver el historial de sus propuestas");
         PropuestaDAO propuestaDAO = new PropuestaDAO();
         return propuestaDAO.getHistorialPropuestasFreelancer(usuarioId, estado);
+    }
+
+    public boolean existsPropuestaEnProyecto(int proyectoId) throws SQLException {
+        PropuestaDAO propuestaDAO = new PropuestaDAO();
+        return propuestaDAO.existsPropuestaEnProyecto(proyectoId);
     }
 }

@@ -9,12 +9,14 @@ import org.proyecto2.proyecto2.dtos.entrega.EntregaUpdate;
 import org.proyecto2.proyecto2.exceptions.EntityAlreadyExistsException;
 import org.proyecto2.proyecto2.exceptions.UserDataInvalidException;
 import org.proyecto2.proyecto2.models.configuracionSistema.ConfiguracionSistema;
+import org.proyecto2.proyecto2.models.contrato.Contrato;
 import org.proyecto2.proyecto2.models.entrega.Entrega;
 import org.proyecto2.proyecto2.models.propuesta.Propuesta;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
 import org.proyecto2.proyecto2.models.usuario.cartera.Cartera;
 import org.proyecto2.proyecto2.models.usuario.cartera.CarteraPlataforma;
 import org.proyecto2.proyecto2.services.configuracionSistema.ConfiguracionSistemaService;
+import org.proyecto2.proyecto2.services.contrato.ContratoService;
 import org.proyecto2.proyecto2.services.propuesta.PropuestaService;
 import org.proyecto2.proyecto2.services.proyecto.ProyectoService;
 import org.proyecto2.proyecto2.services.usuario.cartera.CarteraPlataformaService;
@@ -100,6 +102,11 @@ public class EntregaService {
             PropuestaService propuestaService = new PropuestaService();
             Propuesta propuesta = propuestaService.getPropuestaById(propuestaId, connection);
 
+            int contratoId = entregaDAO.getTheContratoIdByEntregaId(entregaId, connection);
+            ContratoService contratoService = new ContratoService();
+            Contrato contrato = contratoService.getContractById(contratoId, connection);
+            contratoService.updateFinalizarContrato(contratoFinalizado, connection);
+
             CarteraService carteraService = new CarteraService();
             Cartera carteraCliente = carteraService.getCarteraById(usuarioId);
             if (carteraCliente.getSaldoBloqueado() < propuesta.getMonto())
@@ -118,8 +125,6 @@ public class EntregaService {
             CarteraPlataformaService carteraPlataformaService = new CarteraPlataformaService();
             CarteraPlataforma carteraPlataforma = carteraPlataformaService.getCarteraPlataforma();
             carteraPlataforma.setSaldo(carteraPlataforma.getSaldo() + comisionPlataforma);
-
-            int contratoId = entregaDAO.getTheContratoIdByEntregaId(entregaId, connection);
             carteraPlataformaService.updateCarteraPlataforma(connection, carteraPlataforma, contratoId, configuracionSistema.getComision(), comisionPlataforma);
 
             connection.commit();

@@ -1,0 +1,32 @@
+<form [formGroup]="solicitudForm" (ngSubmit)="enviar()">
+
+    <div class="mb-3">
+        <label class="form-label small text-light opacity-75">
+            Nombre de la {{ tipoCatalogo === enumTipo.Habilidad ? 'Habilidad' : 'Categoría' }} sugerida
+        </label>
+        <input type="text" class="form-control bg-dark text-light border-secondary" formControlName="nombre"
+            placeholder="Ej: Angular, Fontanería, Auditoría...">
+        @if (solicitudForm.get('nombre')?.invalid && solicitudForm.get('nombre')?.touched) {
+        <small class="text-warning">El nombre es obligatorio.</small>
+        }
+    </div>
+
+    <div class="mb-4">
+        <label class="form-label small text-light opacity-75">Descripción / Justificación</label>
+        <textarea class="form-control bg-dark text-light border-secondary" formControlName="descripcion" rows="3"
+            placeholder="Explica brevemente de qué trata y por qué debería agregarse a la plataforma..."></textarea>
+        @if (solicitudForm.get('descripcion')?.invalid && solicitudForm.get('descripcion')?.touched) {
+        <small class="text-warning">La descripción es obligatoria.</small>
+        }
+    </div>
+
+    <div class="d-grid border-top border-dark pt-4">
+        <button type="submit" class="btn btn-lg fw-bold text-dark"
+            [ngClass]="solicitudEditando ? 'btn-warning' : 'btn-info'" [disabled]="isSubmitting">
+            @if (isSubmitting) { <span class="spinner-border spinner-border-sm me-2 text-dark"></span> }
+            <i class="fa-solid" [ngClass]="solicitudEditando ? 'fa-save' : 'fa-paper-plane'"></i>
+            {{ solicitudEditando ? 'Guardar Cambios' : 'Enviar Solicitud' }}
+        </button>
+    </div>
+
+</form>

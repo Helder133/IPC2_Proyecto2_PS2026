@@ -1,0 +1,30 @@
+<form [formGroup]="entregaForm" (ngSubmit)="enviar()">
+
+    <div class="mb-3">
+        <label class="form-label small text-light opacity-75">Descripción del Trabajo Realizado</label>
+        <textarea class="form-control bg-dark text-light border-secondary" formControlName="descripcion" rows="4"
+            placeholder="Detalla qué incluye esta entrega y si el cliente debe tomar algo en cuenta..."></textarea>
+        @if (entregaForm.get('descripcion')?.invalid && entregaForm.get('descripcion')?.touched) {
+        <small class="text-warning">La descripción es obligatoria (mín. 10 caracteres).</small>
+        }
+    </div>
+
+    <div class="mb-4">
+        <label class="form-label small text-light opacity-75">Enlace del Archivo / Repositorio</label>
+        <input type="text" class="form-control bg-dark text-light border-secondary" formControlName="archivo"
+            placeholder="Ej: https://github.com/usuario/repo o enlace de Google Drive">
+        @if (entregaForm.get('archivo')?.invalid && entregaForm.get('archivo')?.touched) {
+        <small class="text-warning">Debes adjuntar el enlace al trabajo realizado.</small>
+        }
+    </div>
+
+    <div class="d-grid border-top border-dark pt-4">
+        <button type="submit" class="btn btn-lg fw-bold text-dark"
+            [ngClass]="entregaPendiente ? 'btn-warning' : 'btn-info'" [disabled]="isSubmitting">
+            @if (isSubmitting) { <span class="spinner-border spinner-border-sm me-2 text-dark"></span> }
+            <i class="fa-solid" [ngClass]="entregaPendiente ? 'fa-save' : 'fa-paper-plane'"></i>
+            {{ entregaPendiente ? 'Guardar Cambios' : 'Enviar a Revisión' }}
+        </button>
+    </div>
+
+</form>

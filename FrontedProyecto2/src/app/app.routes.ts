@@ -18,6 +18,12 @@ import { ClienteProyectosComponent } from './pages/client/cliente-proyectos/clie
 import { FreelancerBuscarProyectosComponent } from './pages/freelancer/freelancer-buscar-proyectos/freelancer-buscar-proyectos.component';
 import { FreelancerPropuestasComponent } from './pages/freelancer/freelancer-propuestas/freelancer-propuestas.component';
 import { ClienteProyectoDetalleComponent } from './pages/client/cliente-proyecto-detalle/cliente-proyecto-detalle.component';
+import { FreelancerContratosComponent } from './pages/freelancer/freelancer-contratos/freelancer-contratos.component';
+import { FreelancerContratoDetalleComponent } from './pages/freelancer/freelancer-contrato-detalle/freelancer-contrato-detalle.component';
+import { ClienteContratosComponent } from './pages/client/cliente-contratos/cliente-contratos.component';
+import { ClienteContratoDetalleComponent } from './pages/client/cliente-contrato-detalle/cliente-contrato-detalle.component';
+import { MisSolicitudesComponent } from './pages/mis-solicitudes/mis-solicitudes.component';
+import { AdminSolicitudesComponent } from './pages/admin/admin-solicitudes/admin-solicitudes.component';
 
 export const routes: Routes = [
     {
@@ -74,6 +80,18 @@ export const routes: Routes = [
                 data: { role: EnumUsuario.Freelancer }
             },
             {
+                path: 'freelancer/contratos',
+                component: FreelancerContratosComponent,
+                canActivate: [authGuard],
+                data: { role: EnumUsuario.Freelancer }
+            },
+            {
+                path: 'freelancer/contrato-detalle',
+                component: FreelancerContratoDetalleComponent,
+                canActivate: [authGuard],
+                data: { role: EnumUsuario.Freelancer }
+            },
+            {
                 path: 'cliente/proyectos',
                 component: ClienteProyectosComponent,
                 canActivate: [authGuard],
@@ -82,6 +100,18 @@ export const routes: Routes = [
             {
                 path: 'cliente/proyecto-detalle',
                 component: ClienteProyectoDetalleComponent,
+                canActivate: [authGuard],
+                data: { role: EnumUsuario.Cliente }
+            },
+            {
+                path: 'cliente/contratos',
+                component: ClienteContratosComponent,
+                canActivate: [authGuard],
+                data: { role: EnumUsuario.Cliente }
+            },
+            {
+                path: 'cliente/contrato-detalle',
+                component: ClienteContratoDetalleComponent,
                 canActivate: [authGuard],
                 data: { role: EnumUsuario.Cliente }
             },
@@ -110,6 +140,12 @@ export const routes: Routes = [
                 data: { role: EnumUsuario.Administrador }
             },
             {
+                path: 'admin/solicitudes',
+                component: AdminSolicitudesComponent,
+                canActivate: [authGuard],
+                data: { role: EnumUsuario.Administrador }
+            },
+            {
                 path: 'mi-perfil',
                 component: MiPerfilComponent,
                 canActivate: [authGuard],
@@ -120,6 +156,12 @@ export const routes: Routes = [
                 component: MiCarteraComponent,
                 canActivate: [authGuard],
                 data: { role: [EnumUsuario.Cliente, EnumUsuario.Freelancer, EnumUsuario.Administrador] }
+            },
+            {
+                path: 'solicitudes',
+                component: MisSolicitudesComponent,
+                canActivate: [authGuard],
+                data: { role: [EnumUsuario.Cliente, EnumUsuario.Freelancer] }
             }
         ]
     },

@@ -37,12 +37,13 @@
         <div class="col d-flex flex-column">
 
             <div class="flex-grow-1" (click)="verProyecto(prop.proyectoId)" style="cursor: pointer;">
-                <app-propuesta-card-component [propuesta]="prop" vistaRol="freelancer" class="h-100 d-block"></app-propuesta-card-component>
+                <app-propuesta-card-component [propuesta]="prop" vistaRol="freelancer"
+                    class="h-100 d-block"></app-propuesta-card-component>
             </div>
 
             @if (prop.estado === 'ACEPTADA') {
-            <button class="btn btn-success btn-sm w-100 fw-bold mt-2 shadow">
-                <i class="fa-solid fa-file-contract me-1"></i> Ir al Contrato
+            <button class="btn btn-success btn-sm w-100 fw-bold mt-2 shadow" (click)="irAlContrato(prop.propuestaId)">
+                <i class="fa-solid fa-file-contract me-1"></i> Ir a Mis Contratos
             </button>
             }
         </div>

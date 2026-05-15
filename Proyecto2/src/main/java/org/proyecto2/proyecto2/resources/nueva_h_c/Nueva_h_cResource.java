@@ -28,8 +28,9 @@ public class Nueva_h_cResource {
     public Response createNueva_h_c(Nueva_h_cRequest nueva_h_cRequest, @Context ContainerRequestContext request) {
         try {
             String rol = (String) request.getProperty("rol");
+            int usuarioId = (int) request.getProperty("usuarioId");
             Nueva_h_cService nueva_h_cService = new Nueva_h_cService();
-            nueva_h_cService.createNueva_h_c(nueva_h_cRequest, EnumUsuario.valueOf(rol));
+            nueva_h_cService.createNueva_h_c(nueva_h_cRequest, EnumUsuario.valueOf(rol), usuarioId);
             return Response.status(Response.Status.CREATED)
                     .entity("{\"message\": \"Solicitud de nueva " + nueva_h_cRequest.getTipo().name() + " creada exitosamente\"}")
                     .build();

@@ -151,8 +151,7 @@ public class Proyecto {
                 && presupuesto > 0
                 && estado != null
                 && fechaCreacion != null
-                && fechaLimite != null
-                && fechaLimite.isAfter(fechaCreacion);
+                && fechaLimite != null;
     }
 
     public boolean isValidUpdate() {

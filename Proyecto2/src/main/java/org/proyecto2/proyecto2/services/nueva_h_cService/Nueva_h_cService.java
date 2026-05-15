@@ -20,8 +20,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class Nueva_h_cService {
-    public void createNueva_h_c(Nueva_h_cRequest nueva_h_cRequest, EnumUsuario rol) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
+    public void createNueva_h_c(Nueva_h_cRequest nueva_h_cRequest, EnumUsuario rol, int usuarioId) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
         Nueva_h_c nuevaHC = new Nueva_h_c(nueva_h_cRequest);
+        nuevaHC.setUsuarioId(usuarioId);
         if (!nuevaHC.isValid())
             throw new UserDataInvalidException("Los datos de la solicitud no son válidos. Verifique que el nombre y la descripción que estén correctamente ingresados.");
         if (EnumNueva_h_cTipo.CATEGORIA.equals(nuevaHC.getTipo())) {
@@ -73,7 +74,7 @@ public class Nueva_h_cService {
 
     public void updateNuevo(Nueva_h_cUpdate nueva_h_cUpdate) throws SQLException, UserDataInvalidException, EntityAlreadyExistsException {
         Nueva_h_c nuevaHC = new Nueva_h_c(nueva_h_cUpdate);
-        if (nuevaHC.isValidUpdate())
+        if (!nuevaHC.isValidUpdate())
             throw new UserDataInvalidException("Los nuevos datos de la solicitud no son válidos. Verifique que el nombre y la descripción que estén correctamente ingresados.");
         Nueva_h_cDAO nuevaHCDAO = new Nueva_h_cDAO();
         Nueva_h_c nuevaHC1 = nuevaHCDAO.getById(nuevaHC.getSolicitudId()).orElseThrow(() -> new UserDataInvalidException("La solicitud no existe"));

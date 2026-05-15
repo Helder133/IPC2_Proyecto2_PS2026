@@ -10,6 +10,7 @@ import org.proyecto2.proyecto2.models.habilidad.Habilidad;
 import org.proyecto2.proyecto2.models.proyecto.EnumProyecto;
 import org.proyecto2.proyecto2.models.proyecto.Proyecto;
 import org.proyecto2.proyecto2.models.usuario.EnumUsuario;
+import org.proyecto2.proyecto2.services.propuesta.PropuestaService;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,6 +24,8 @@ public class ProyectoService {
         Proyecto proyecto = new Proyecto(proyectoRequest);
         proyecto.setUsuarioId(usuarioId);
         if (!proyecto.isValid()) throw new UserDataInvalidException("Los datos del proyecto no son válidos.");
+        if (proyectoRequest.getProyectoHabilidadRequest().isEmpty())
+            throw new UserDataInvalidException("El proyecto debe tener al menos una habilidad.");
         ProyectoDAO proyectoDAO = new ProyectoDAO();
         Connection connection = DBConnection.getInstance().getConnection();
         connection.setAutoCommit(false);
@@ -85,9 +88,10 @@ public class ProyectoService {
         if (!EnumUsuario.Cliente.equals(rol))
             throw new UserDataInvalidException("El usuario no tiene permisos para actualizar el estado de un proyecto.");
         ProyectoDAO proyectoDAO = new ProyectoDAO();
-        if (!proyectoDAO.existsProyectoUsuario(proyectoId, usuarioId))
-            throw new UserDataInvalidException("El proyecto no existe o no pertenece al usuario.");
-        proyectoDAO.updateEstado(EnumProyecto.EN_REVISION,proyectoId);
+        Proyecto proyecto = proyectoDAO.getById(proyectoId).orElseThrow(() -> new UserDataInvalidException("El proyecto no existe."));
+        PropuestaService propuestaService = new PropuestaService();
+        if (proyecto.getEstado().equals(EnumProyecto.ABIERTO) && propuestaService.existsPropuestaEnProyecto(proyectoId))
+            proyectoDAO.updateEstado(EnumProyecto.EN_REVISION, proyectoId);
     }
 
     private List<Habilidad> extraerHabilidades(int proyectoId) throws SQLException, UserDataInvalidException {

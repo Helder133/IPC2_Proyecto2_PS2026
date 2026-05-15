@@ -34,6 +34,11 @@ public class ContratoService {
         return contratoDAO.getById(contratoId).orElseThrow(() -> new UserDataInvalidException("La contrato no existe"));
     }
 
+    public Contrato getContratoByPropuestaId(int propuestaId) throws SQLException, UserDataInvalidException {
+        ContratoDAO contratoDAO = new ContratoDAO();
+        return contratoDAO.getContratoByPropuestaId(propuestaId).orElseThrow(() -> new UserDataInvalidException("La contrato no existe"));
+    }
+
     public Contrato getContractById(int contratoId, Connection connection) throws SQLException, UserDataInvalidException {
         ContratoDAO contratoDAO = new ContratoDAO();
         return contratoDAO.getById(contratoId, connection).orElseThrow(() -> new UserDataInvalidException("La contrato no existe"));

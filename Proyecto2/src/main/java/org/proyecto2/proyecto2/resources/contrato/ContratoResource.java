@@ -71,6 +71,20 @@ public class ContratoResource {
         }
     }
 
+    @GET
+    @Path("/propuesta/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getContratoByPropuestaId(@PathParam("id") int id) {
+        try {
+            ContratoService contratoService = new ContratoService();
+            return Response.ok(new ContratoResponse(contratoService.getContratoByPropuestaId(id))).build();
+        } catch (UserDataInvalidException e) {
+            return errorEjecucion(e.getMessage(), 1);
+        } catch (SQLException e) {
+            return errorEjecucion(e.getMessage(), 3);
+        }
+    }
+
     @PUT
     @Path("/cancelar")
     @Secured

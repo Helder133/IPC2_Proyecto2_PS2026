@@ -15,6 +15,7 @@ public class Contrato {
     private LocalDate fechaFinalizacion;
     private String comentario;
     private int calificacion;
+    private String tituloProyecto; //solo aplica para el get del freelancer y para el del cliente
 
     public Contrato(int contratoId, int propuestaId, EnumContrato estado, String motivoCancelacion, LocalDate fechaCreacion, LocalDate fechaFinalizacion, String comentario, int calificacion) {
         this.contratoId = contratoId;
@@ -108,6 +109,14 @@ public class Contrato {
 
     public void setCalificacion(int calificacion) {
         this.calificacion = calificacion;
+    }
+
+    public String getTituloProyecto() {
+        return tituloProyecto;
+    }
+
+    public void setTituloProyecto(String tituloProyecto) {
+        this.tituloProyecto = tituloProyecto;
     }
 
     public boolean isValid() {

@@ -1,0 +1,160 @@
+<div class="container-fluid py-4">
+
+    <div class="d-flex align-items-center mb-4">
+        <button class="btn btn-outline-light btn-sm me-3" (click)="volver()" [disabled]="isLoading()">
+            <i class="fa-solid fa-arrow-left"></i> Mis Contratos
+        </button>
+        <h4 class="text-white mb-0">Revisión de Entregas</h4>
+    </div>
+
+    @if (errorMessage()) { <div class="alert alert-danger shadow-sm border-0 mb-4">{{ errorMessage() }}</div> }
+    @if (successMessage()) { <div class="alert alert-success shadow-sm border-0 mb-4">{{ successMessage() }}</div> }
+
+    @if (isLoading()) {
+    <div class="text-center py-5 text-info">
+        <span class="spinner-border spinner-border-lg"></span>
+        <p class="mt-2">Cargando espacio de trabajo...</p>
+    </div>
+    } @else if (contrato()) {
+
+    <div class="row g-4">
+
+        <div class="col-xl-5 col-lg-6">
+
+            <div class="card bg-dark border-secondary text-light shadow-sm mb-4 border-start border-warning border-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h5 class="text-info fw-bold mb-0">{{ contrato()!.tituloProyecto }}</h5>
+                            <small class="text-light opacity-50">Contrato #{{ contrato()!.contratoId }}</small>
+                        </div>
+                        <span class="badge bg-warning text-dark">{{ contrato()!.estado }}</span>
+                    </div>
+
+                    @if (contrato()!.estado === enumContrato.Activo) {
+                    <div class="mt-3 pt-3 border-top border-secondary text-end">
+                        <button class="btn btn-outline-danger btn-sm" (click)="iniciarCancelacion()">
+                            <i class="fa-solid fa-ban me-1"></i> Cancelar Contrato
+                        </button>
+                    </div>
+                    }
+                </div>
+            </div>
+
+            <h6 class="text-white mb-3 border-bottom border-secondary pb-2">Entregas del Freelancer</h6>
+
+            @if (entregas().length === 0) {
+            <div class="text-center py-4 bg-secondary rounded border border-dark">
+                <i class="fa-solid fa-clock fs-2 text-light opacity-25 mb-2 d-block"></i>
+                <p class="small text-light opacity-50 mb-0">El freelancer aún no ha subido ninguna entrega.</p>
+            </div>
+            }
+
+            <div class="d-flex flex-column gap-3">
+                @for (ent of entregas(); track ent.entregaId) {
+                <app-entrega-card-component [entrega]="ent" vistaRol="cliente" (onAprobar)="iniciarAprobacion($event)"
+                    (onRechazar)="iniciarRechazo($event)">
+                </app-entrega-card-component>
+                }
+            </div>
+
+        </div>
+
+        <div class="col-xl-7 col-lg-6">
+            <div class="card bg-secondary text-light shadow-sm border-0 sticky-top" style="top: 20px;">
+
+                <div
+                    class="card-header border-bottom border-dark py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-white">Panel de Acción</h5>
+                    @if (accionActual() !== 'ninguna') {
+                    <button class="btn btn-sm btn-outline-light" (click)="cancelarAccion()"><i
+                            class="fa-solid fa-xmark"></i></button>
+                    }
+                </div>
+
+                <div class="card-body p-4">
+
+                    @if (accionActual() === 'ninguna') {
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-list-check fs-1 text-light opacity-50 mb-3"></i>
+                        <h5 class="text-white">Selecciona una acción</h5>
+                        <p class="text-light opacity-75">Revisa las entregas a la izquierda para aprobarlas o
+                            rechazarlas.</p>
+                    </div>
+                    }
+
+                    @if (accionActual() === 'aprobar') {
+                    <div class="alert alert-success border-0 bg-success text-dark mb-4">
+                        <i class="fa-solid fa-circle-info me-2"></i> Estás a punto de aceptar el trabajo. Esto
+                        finalizará el contrato y transferirá los fondos.
+                    </div>
+                    <form [formGroup]="aprobarForm" (ngSubmit)="confirmarAprobacion()">
+                        <div class="mb-3">
+                            <label class="form-label small text-light opacity-75">Calificación (1 al 5)</label>
+                            <input type="number" class="form-control bg-dark text-warning fw-bold border-secondary fs-5"
+                                formControlName="calificacion" min="1" max="5">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small text-light opacity-75">Comentario / Reseña para el
+                                Freelancer</label>
+                            <textarea class="form-control bg-dark text-light border-secondary"
+                                formControlName="comentario" rows="3"></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success fw-bold text-dark" [disabled]="isSubmitting()">
+                                @if (isSubmitting()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                                <i class="fa-solid fa-check-double me-1"></i> Aprobar y Finalizar Contrato
+                            </button>
+                        </div>
+                    </form>
+                    }
+
+                    @if (accionActual() === 'rechazar') {
+                    <div class="alert alert-warning border-0 bg-warning text-dark mb-4">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i> El freelancer deberá subir una nueva
+                        entrega corrigiendo los detalles.
+                    </div>
+                    <form [formGroup]="rechazarForm" (ngSubmit)="confirmarRechazo()">
+                        <div class="mb-4">
+                            <label class="form-label small text-light opacity-75">Motivo del Rechazo (Sé
+                                específico)</label>
+                            <textarea class="form-control bg-dark text-light border-secondary"
+                                formControlName="motivo_rechazo" rows="4"
+                                placeholder="Ej: Faltó incluir la funcionalidad X..."></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-danger fw-bold text-white" [disabled]="isSubmitting()">
+                                @if (isSubmitting()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                                <i class="fa-solid fa-xmark me-1"></i> Enviar Rechazo
+                            </button>
+                        </div>
+                    </form>
+                    }
+
+                    @if (accionActual() === 'cancelar') {
+                    <div class="alert alert-danger border-0 bg-danger text-white mb-4">
+                        <i class="fa-solid fa-skull me-2"></i> <strong>Peligro:</strong> Esta acción es irreversible. El
+                        contrato terminará sin pago.
+                    </div>
+                    <form [formGroup]="cancelarForm" (ngSubmit)="confirmarCancelacion()">
+                        <div class="mb-4">
+                            <label class="form-label small text-light opacity-75">Motivo de Cancelación</label>
+                            <textarea class="form-control bg-dark text-light border-secondary"
+                                formControlName="motivoCancelacion" rows="4"></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-outline-danger fw-bold" [disabled]="isSubmitting()">
+                                @if (isSubmitting()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+                                Confirmar Cancelación Definitiva
+                            </button>
+                        </div>
+                    </form>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    }
+</div>

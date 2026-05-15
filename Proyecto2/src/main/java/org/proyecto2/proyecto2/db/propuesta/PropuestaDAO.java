@@ -20,12 +20,24 @@ public class PropuestaDAO implements CRUD<Propuesta> {
     private static final String GET_BY_ID_PROPUESTA = "SELECT * FROM propuesta WHERE propuesta_id = ?";
     private static final String GET_ALL_PROPUESTA_FOR_A_PROYECTO = "SELECT p.propuesta_id, p.proyecto_id, p.monto, p.tiempo_entrega, p.descripcion, p.estado, p.fecha_creacion, u.usuario_id, u.nombre_completo, u.user_name, COALESCE(cal.promedio_calificacion, 0) AS promedio_calificacion, COALESCE(cal.total_calificaciones, 0) AS total_calificaciones FROM propuesta p INNER JOIN usuario u ON p.usuario_id = u.usuario_id LEFT JOIN (SELECT p2.usuario_id, COUNT(c.calificacion) AS total_calificaciones, AVG(c.calificacion) AS promedio_calificacion FROM propuesta p2 INNER JOIN contrato c ON p2.propuesta_id = c.propuesta_id GROUP BY p2.usuario_id) cal ON p.usuario_id = cal.usuario_id JOIN proyecto p3 on p.proyecto_id = p3.proyecto_id WHERE p.proyecto_id = ? AND p3.usuario_id = ?";
     private static final String GET_ALL_PROPUESTA_FROM_A_FREELANCER = "SELECT * FROM propuesta WHERE usuario_id = ? AND proyecto_id = ?";
+    private static final String RECHAZAR_DEMAS_PROPUESTAS = "UPDATE propuesta SET estado = 'RECHAZADA' WHERE proyecto_id = ? AND propuesta_id <> ? AND estado = 'PENDIENTE'";
+    private static final String EXISTS_PROPUESTA_EN_PROYECTO = "SELECT 1 FROM propuesta WHERE proyecto_id = ? AND estado <> 'RETIRADO'";
 
     public boolean existsPropuesta(int propuestaId, int usuarioId) throws SQLException {
         Connection connection = DBConnection.getInstance().getConnection();
         try (PreparedStatement select = connection.prepareStatement(EXISTS_PROPUESTA)) {
             select.setInt(1, propuestaId);
             select.setInt(2, usuarioId);
+            try (ResultSet rs = select.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    public boolean existsPropuestaEnProyecto(int proyectoId) throws SQLException {
+        Connection connection = DBConnection.getInstance().getConnection();
+        try (PreparedStatement select = connection.prepareStatement(EXISTS_PROPUESTA_EN_PROYECTO)) {
+            select.setInt(1, proyectoId);
             try (ResultSet rs = select.executeQuery()) {
                 return rs.next();
             }
@@ -74,6 +86,14 @@ public class PropuestaDAO implements CRUD<Propuesta> {
     public void updateEstado(EnumPropuesta estado, int propuestaId, Connection connection) throws SQLException {
         try (PreparedStatement update = connection.prepareStatement(UPDATE_PROPUESTA_ESTADO)) {
             update.setString(1, estado.name());
+            update.setInt(2, propuestaId);
+            update.executeUpdate();
+        }
+    }
+
+    public void rechazarDemasPropuestas(int proyectoId, int propuestaId, Connection connection) throws SQLException {
+        try (PreparedStatement update = connection.prepareStatement(RECHAZAR_DEMAS_PROPUESTAS)) {
+            update.setInt(1, proyectoId);
             update.setInt(2, propuestaId);
             update.executeUpdate();
         }
